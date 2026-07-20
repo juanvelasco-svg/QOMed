@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Profesor</title>
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="images/logo.png" alt="Logo" class="nav-logo">
+            <span>Panel del Profesor</span>
+        </div>
+        <div class="nav-user">
+            <span id="teacherName">Profesor</span>
+            <button onclick="logoutUser()" class="btn btn-logout">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>Mis Clases</h1>
+            <button class="btn btn-primary" onclick="teacherPanel.openClassModal()">
+                + Agregar Clase
+            </button>
+        </header>
+
+        <div id="classesGrid" class="classes-grid">
+            <!-- Las clases se cargan dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Clase -->
+    <div id="classModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="teacherPanel.closeModal()">&times;</span>
+            <h2 id="classModalTitle">Nueva Clase</h2>
+            <form id="classForm">
+                <input type="hidden" id="classId">
+                <div class="form-group">
+                    <label>Título de la Clase</label>
+                    <input type="text" id="classTitle" required placeholder="Ej: Introducción a la Programación">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="classDescription" rows="3" required placeholder="Descripción de la clase..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Enlace al Repositorio (GitHub)</label>
+                    <input type="url" id="classLink" required placeholder="https://github.com/...">
+                </div>
+                <div class="form-group">
+                    <label>Color de la tarjeta</label>
+                    <input type="color" id="classColor" value="#4CAF50">
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Clase</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Progreso de Alumnos -->
+    <div id="progressModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="teacherPanel.closeProgressModal()">&times;</span>
+            <h2>Progreso de Alumnos</h2>
+            <h3 id="progressClassName"></h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Alumno</th>
+                            <th>Email</th>
+                            <th>Progreso</th>
+                            <th>Última Actividad</th>
+                            <th>Acceso a Clase</th>
+                        </tr>
+                    </thead>
+                    <tbody id="progressTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/teacher-panel.js"></script>
+    <script>
+        // Verificar autenticación y rol
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getCurrentSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            if (session.rol !== 'admin' && session.rol !== 'profesor') {
+                const redirectMap = {
+                    'admin': 'admin.html',
+                    'profesor': 'teacher.html',
+                    'alumno': 'student.html'
+                };
+                window.location.href = redirectMap[session.rol];
+                return;
+            }
+            
+            // Actualizar nombre
+            const users = JSON.parse(localStorage.getItem('edu_platform_users')) || [];
+            const currentUser = users.find(u => u.id === session.userId);
+            if (currentUser) {
+                document.getElementById('teacherName').textContent = currentUser.nombre;
+            }
+        });
+    </script>
+</body>
+</html>

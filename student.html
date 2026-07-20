@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Alumno</title>
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="images/logo.png" alt="Logo" class="nav-logo">
+            <span>Mis Cursos</span>
+        </div>
+        <div class="nav-user">
+            <span id="studentName">Alumno</span>
+            <button onclick="logoutUser()" class="btn btn-logout">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>Clases Disponibles</h1>
+            <div class="view-toggle">
+                <button class="btn btn-secondary active" data-view="all">Todas</button>
+                <button class="btn btn-secondary" data-view="pending">Pendientes</button>
+                <button class="btn btn-secondary" data-view="progress">En Progreso</button>
+                <button class="btn btn-secondary" data-view="completed">Completadas</button>
+            </div>
+        </header>
+
+        <div id="studentClassesGrid" class="classes-grid">
+            <!-- Las clases se cargan dinámicamente -->
+        </div>
+
+        <section class="activity-section">
+            <h2>Mi Actividad Reciente</h2>
+            <div id="activityList" class="activity-list">
+                <!-- Actividad se carga dinámicamente -->
+            </div>
+        </section>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/student-panel.js"></script>
+    <script>
+        // Verificar autenticación y rol
+        document.addEventListener('DOMContentLoaded', () => {
+            const session = getCurrentSession();
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            if (session.rol !== 'admin' && session.rol !== 'profesor' && session.rol !== 'alumno') {
+                const redirectMap = {
+                    'admin': 'admin.html',
+                    'profesor': 'teacher.html',
+                    'alumno': 'student.html'
+                };
+                window.location.href = redirectMap[session.rol];
+                return;
+            }
+            
+            // Actualizar nombre
+            const users = JSON.parse(localStorage.getItem('edu_platform_users')) || [];
+            const currentUser = users.find(u => u.id === session.userId);
+            if (currentUser) {
+                document.getElementById('studentName').textContent = currentUser.nombre;
+            }
+        });
+    </script>
+</body>
+</html>
