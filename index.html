@@ -5,17 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universidad - Sistema de Gestión de Cursos</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #1e3a8a; margin-bottom: 0.5rem; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
-        .tabs { display: flex; margin-bottom: 1.5rem; border-bottom: 2px solid #eee; }
-        .tab { flex: 1; padding: 0.8rem; text-align: center; cursor: pointer; color: #666; font-weight: 600; }
-        .tab.active { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; }
-        input, select { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 0.9rem; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        button:hover { background: #1e40af; }
-        .hidden { display: none; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 420px;
+            border: 3px solid #D4AF37;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            color: #64748b;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: #1e3a8a;
+            border-bottom-color: #D4AF37;
+        }
+
+        .tab:hover {
+            color: #1e3a8a;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 3rem;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            font-size: 1.2rem;
+            padding: 0.3rem;
+        }
+
+        .toggle-password:hover {
+            color: #1e3a8a;
+        }
+
+        button[type="submit"], .btn-submit {
+            width: 100%;
+            padding: 0.9rem;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        button[type="submit"]:hover, .btn-submit:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+            border-left: 4px solid #16a34a;
+        }
     </style>
 </head>
 <body>
@@ -28,32 +169,205 @@
             <div class="tab" onclick="showTab('register')">Registrarse</div>
         </div>
 
-        <div id="login">
-            <input type="email" placeholder="Email" required>
-            <input type="password" placeholder="Contraseña" required>
-            <button onclick="window.location.href='student.html'">Ingresar</button>
-        </div>
+        <!-- Formulario de Login -->
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <input type="email" id="login-email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input type="password" id="login-password" placeholder="Contraseña" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('login-password', this)">️</button>
+                </div>
+            </div>
+            <div class="error-message" id="login-error"></div>
+            <button type="submit">Ingresar</button>
+        </form>
 
-        <div id="register" class="hidden">
-            <input type="text" placeholder="Nombre Completo" required>
-            <input type="email" placeholder="Email" required>
-            <select>
-                <option value="">Selecciona un rol</option>
-                <option value="student">Alumno</option>
-                <option value="teacher">Profesor</option>
-                <option value="admin">Administrador</option>
-            </select>
-            <input type="password" placeholder="Contraseña" required>
-            <button>Registrarse</button>
-        </div>
+        <!-- Formulario de Registro -->
+        <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+            <div class="success-message" id="register-success"></div>
+            <div class="form-group">
+                <input type="text" id="reg-name" placeholder="Nombre Completo" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="reg-email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <select id="reg-role" required>
+                    <option value="">Selecciona un rol</option>
+                    <option value="student">Alumno</option>
+                    <option value="teacher">Profesor</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input type="password" id="reg-password" placeholder="Contraseña" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('reg-password', this)">👁️</button>
+                </div>
+            </div>
+            <div class="error-message" id="register-error"></div>
+            <button type="submit">Registrarse</button>
+        </form>
     </div>
+
     <script>
+        // Cambiar entre pestañas
         function showTab(tab) {
-            document.getElementById('login').classList.toggle('hidden', tab !== 'login');
-            document.getElementById('register').classList.toggle('hidden', tab !== 'register');
+            document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+            
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
+            
+            // Limpiar mensajes
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('register-error').style.display = 'none';
+            document.getElementById('register-success').style.display = 'none';
         }
+
+        // Mostrar/ocultar contraseña
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        // Manejar registro
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const role = document.getElementById('reg-role').value;
+            const password = document.getElementById('reg-password').value;
+            
+            const errorDiv = document.getElementById('register-error');
+            const successDiv = document.getElementById('register-success');
+            
+            // Validaciones
+            if (!name || !email || !role || !password) {
+                errorDiv.textContent = 'Por favor completa todos los campos';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorDiv.textContent = 'La contraseña debe tener al menos 6 caracteres';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Obtener usuarios existentes
+            let users = JSON.parse(localStorage.getItem('qomed_users') || '[]');
+            
+            // Verificar si el email ya existe
+            if (users.some(u => u.email === email)) {
+                errorDiv.textContent = 'Este email ya está registrado';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Crear nuevo usuario
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                role: role,
+                password: password, // En producción, esto debería estar hasheado
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            };
+            
+            // Guardar usuario
+            users.push(newUser);
+            localStorage.setItem('qomed_users', JSON.stringify(users));
+            
+            // Mostrar éxito
+            errorDiv.style.display = 'none';
+            successDiv.textContent = '¡Registro exitoso! Ahora puedes iniciar sesión';
+            successDiv.style.display = 'block';
+            
+            // Limpiar formulario
+            document.getElementById('reg-name').value = '';
+            document.getElementById('reg-email').value = '';
+            document.getElementById('reg-role').value = '';
+            document.getElementById('reg-password').value = '';
+            
+            // Cambiar a login después de 2 segundos
+            setTimeout(() => {
+                document.querySelector('.tab').click();
+            }, 2000);
+        }
+
+        // Manejar login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+            
+            const errorDiv = document.getElementById('login-error');
+            
+            // Obtener usuarios
+            const users = JSON.parse(localStorage.getItem('qomed_users') || '[]');
+            
+            // Buscar usuario
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (!user) {
+                errorDiv.textContent = 'Email o contraseña incorrectos';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Actualizar último login
+            user.lastLogin = new Date().toISOString();
+            localStorage.setItem('qomed_users', JSON.stringify(users));
+            
+            // Guardar sesión actual
+            localStorage.setItem('qomed_current_user', JSON.stringify(user));
+            
+            // Redirigir según rol
+            switch(user.role) {
+                case 'student':
+                    window.location.href = 'student.html';
+                    break;
+                case 'teacher':
+                    window.location.href = 'teacher.html';
+                    break;
+                case 'admin':
+                    window.location.href = 'admin.html';
+                    break;
+                default:
+                    errorDiv.textContent = 'Rol no válido';
+                    errorDiv.style.display = 'block';
+            }
+        }
+
+        // Verificar si ya hay sesión activa al cargar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = JSON.parse(localStorage.getItem('qomed_current_user') || 'null');
+            if (currentUser) {
+                switch(currentUser.role) {
+                    case 'student':
+                        window.location.href = 'student.html';
+                        break;
+                    case 'teacher':
+                        window.location.href = 'teacher.html';
+                        break;
+                    case 'admin':
+                        window.location.href = 'admin.html';
+                        break;
+                }
+            }
+        });
     </script>
 </body>
 </html>
