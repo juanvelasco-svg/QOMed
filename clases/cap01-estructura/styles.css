@@ -1,0 +1,11 @@
+body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: var(--text-primary);
+    /* Ruta relativa corregida: sube un nivel (../) para llegar a la carpeta img */
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), 
+                url('../img/fondo.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    padding-top: 80px;
+}
