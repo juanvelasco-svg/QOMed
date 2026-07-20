@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap 01: Estructura Molecular y Propiedades | QOMed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Rutas relativas a las carpetas css dentro de cap01-estructura -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header Fijo -->
+    <header class="header">
+        <div class="logo-container">
+            <!-- Ruta corregida a la carpeta img local -->
+            <img src="img/logo.png" alt="Logo de la Universidad" class="university-logo">
+        </div>
+        <h1 class="class-title">Estructura Molecular y Propiedades</h1>
+        <div class="user-controls">
+            <span class="student-name" id="student-name">Cargando...</span>
+            <!-- Ruta corregida para volver a la página maestra en la raíz -->
+            <a href="../../index.html" class="btn-back" id="btn-back">⬅ Volver al Curso</a>
+        </div>
+    </header>
+
+    <!-- Sección Hero/Bienvenida -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Capítulo 01: El Átomo de Carbono</h2>
+            <p class="hero-description">Domina la estructura atómica, los tipos de hibridación (sp³, sp², sp) y la relación entre la longitud y fortaleza de los enlaces covalentes.</p>
+            <div class="modules" id="modules-container">
+                <!-- Se llena dinámicamente con config.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Conceptos Fundamentales -->
+    <section class="concepts" id="concepts-section">
+        <!-- Contenido generado dinámicamente desde config.js -->
+    </section>
+
+    <!-- Sección de Herramientas Interactivas -->
+    <section class="tools">
+        <h2>Herramientas de Apoyo</h2>
+        <div class="tabs">
+            <button class="tab active" data-tab="hybridization">Calculadora de Hibridación</button>
+            <button class="tab" data-tab="bond-strength">Comparador de Enlaces</button>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane active" id="hybridization-pane">
+                <div class="hybridization-calculator">
+                    <h3>Calculadora de Hibridación del Carbono</h3>
+                    <p style="margin-bottom: 1rem; color: #666;">Ingresa el número de átomos enlazados al carbono y los pares de electrones libres.</p>
+                    <div class="calculator-inputs">
+                        <div class="input-group">
+                            <label for="bonds">Átomos enlazados al C</label>
+                            <input type="number" id="bonds" min="2" max="4" value="4">
+                        </div>
+                        <div class="input-group">
+                            <label for="lone-pairs">Pares de electrones libres</label>
+                            <input type="number" id="lone-pairs" min="0" max="2" value="0">
+                        </div>
+                    </div>
+                    <button class="btn-calculate" id="calculate-hybridization">Calcular Hibridación</button>
+                    <div class="result" id="hybridization-result">
+                        <p>Hibridación: <span id="hybridization-value">-</span></p>
+                        <p>Geometría: <span id="geometry-value">-</span></p>
+                        <p>Rotación: <span id="rotation-value">-</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="bond-strength-pane">
+                <h3>Fortaleza vs. Longitud de Enlace</h3>
+                <div class="bond-comparison">
+                    <div class="bond-type">
+                        <h4>Enlace Simple (C-C)</h4>
+                        <p>Longitud: ~154 pm</p>
+                        <div class="bond-strength">
+                            <div class="strength-bar" style="width: 40%;"></div>
+                            <span>Energía: 347 kJ/mol</span>
+                        </div>
+                    </div>
+                    <div class="bond-type">
+                        <h4>Enlace Doble (C=C)</h4>
+                        <p>Longitud: ~134 pm</p>
+                        <div class="bond-strength">
+                            <div class="strength-bar" style="width: 65%;"></div>
+                            <span>Energía: 614 kJ/mol</span>
+                        </div>
+                    </div>
+                    <div class="bond-type">
+                        <h4>Enlace Triple (C≡C)</h4>
+                        <p>Longitud: ~120 pm</p>
+                        <div class="bond-strength">
+                            <div class="strength-bar" style="width: 100%;"></div>
+                            <span>Energía: 839 kJ/mol</span>
+                        </div>
+                    </div>
+                </div>
+                <p style="margin-top: 1.5rem; text-align: center; font-style: italic; color: #555;">
+                    💡 Regla: A menor longitud de enlace, mayor fortaleza. (Triple > Doble > Simple)
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Ejercicios Interactivos -->
+    <section class="exercises" id="exercises-section">
+        <!-- Contenido generado dinámicamente desde config.js -->
+    </section>
+
+    <!-- Sección de Quiz -->
+    <section class="quiz" id="quiz-section">
+        <!-- Contenido generado dinámicamente desde config.js -->
+    </section>
+
+    <!-- Sección de Nemotecnia -->
+    <section class="mnemonics">
+        <h2>🧠 Nemotecnias para Conceptos Clave</h2>
+        <div class="mnemonics-grid" id="mnemonics-section">
+            <!-- Contenido generado dinámicamente desde config.js -->
+        </div>
+    </section>
+
+    <!-- Barra de Progreso -->
+    <div class="progress-bar-container">
+        <div class="progress-bar">
+            <div class="progress" id="progress-bar" style="width: 0%"></div>
+        </div>
+        <span class="progress-text">0% completado</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <button class="btn-complete" id="btn-complete">✅ Marcar clase como completada y guardar progreso</button>
+    </footer>
+
+    <!-- Scripts (Rutas relativas a la carpeta js local) -->
+    <script src="js/config.js"></script>
+    <script src="js/progress.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/quiz.js"></script>
+    <script>
+        // Inicializar iconos de Lucide
+        lucide.createIcons();
+    </script>
+</body>
+</html>
