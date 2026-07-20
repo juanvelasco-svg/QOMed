@@ -3,70 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administrador | QOMed</title>
+    <title>Panel de Administrador</title>
     <style>
-        :root { --primary: #003366; --secondary: #D4AF37; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; }
-        header { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logout { color: white; text-decoration: none; background: #c00000; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; }
+        header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logout { color: white; text-decoration: none; background: #dc2626; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; }
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
-        .stat-card h3 { font-size: 2rem; color: var(--primary); margin: 0.5rem 0; }
-        .stat-card p { color: #666; margin: 0; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card h3 { font-size: 2rem; color: #1e3a8a; margin: 0.5rem 0; }
+        table { width: 100%; background: white; border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 2rem; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f1f5f9; color: #334155; font-weight: 600; }
     </style>
 </head>
 <body>
     <header>
-        <strong>QOMed</strong> | Panel de Administración
-        <a href="index.html" class="logout" onclick="localStorage.clear()">Cerrar Sesión</a>
+        <strong>Panel de Administración</strong>
+        <a href="index.html" class="logout">Cerrar Sesión</a>
     </header>
-
     <div class="container">
+        <h2>📊 Dashboard</h2>
         <div class="stats">
-            <div class="stat-card">
-                <p>Total Usuarios</p>
-                <h3>142</h3>
-            </div>
-            <div class="stat-card">
-                <p>Profesores</p>
-                <h3>8</h3>
-            </div>
-            <div class="stat-card">
-                <p>Alumnos Activos</p>
-                <h3>134</h3>
-            </div>
-            <div class="stat-card">
-                <p>Clases Publicadas</p>
-                <h3>1</h3>
-            </div>
+            <div class="stat-card"><p>Total Usuarios</p><h3>0</h3></div>
+            <div class="stat-card"><p>Usuarios Activos</p><h3>0</h3></div>
+            <div class="stat-card"><p>Profesores</p><h3>0</h3></div>
+            <div class="stat-card"><p>Alumnos</p><h3>0</h3></div>
         </div>
-
-        <h3>Última Actividad del Sistema</h3>
-        <table style="width: 100%; background: white; border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-            <thead>
-                <tr>
-                    <th>Usuario</th>
-                    <th>Rol</th>
-                    <th>Acción</th>
-                    <th>Fecha</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>ALUMNO001</td>
-                    <td>Alumno</td>
-                    <td>Completó Capítulo 01 (100%)</td>
-                    <td>Hoy, 10:30 AM</td>
-                </tr>
-                <tr>
-                    <td>PROFESOR01</td>
-                    <td>Profesor</td>
-                    <td>Actualizó contenido de Química Orgánica</td>
-                    <td>Ayer, 4:15 PM</td>
-                </tr>
-            </tbody>
-        </table>
+        <h3>Gestión de Profesores</h3>
+        <table><thead><tr><th>Nombre</th><th>Email</th><th>Clases</th><th>Último Acceso</th><th>Acciones</th></tr></thead><tbody><tr><td colspan="5">No hay datos</td></tr></tbody></table>
+        <h3>Gestión de Alumnos</h3>
+        <table><thead><tr><th>Nombre</th><th>Email</th><th>Progreso General</th><th>Último Acceso</th><th>Acciones</th></tr></thead><tbody><tr><td colspan="5">No hay datos</td></tr></tbody></table>
     </div>
 </body>
 </html>
