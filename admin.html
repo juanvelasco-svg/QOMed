@@ -3,257 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administrador</title>
-    <link rel="stylesheet" href="css/themes.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Panel de Administrador | QOMed</title>
+    <style>
+        :root { --primary: #003366; --secondary: #D4AF37; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; }
+        header { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logout { color: white; text-decoration: none; background: #c00000; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card h3 { font-size: 2rem; color: var(--primary); margin: 0.5rem 0; }
+        .stat-card p { color: #666; margin: 0; }
+    </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">
-            <img src="images/logo.png" alt="Logo" class="nav-logo">
-            <span>Panel de Administración</span>
+    <header>
+        <strong>QOMed</strong> | Panel de Administración
+        <a href="index.html" class="logout" onclick="localStorage.clear()">Cerrar Sesión</a>
+    </header>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <p>Total Usuarios</p>
+                <h3>142</h3>
+            </div>
+            <div class="stat-card">
+                <p>Profesores</p>
+                <h3>8</h3>
+            </div>
+            <div class="stat-card">
+                <p>Alumnos Activos</p>
+                <h3>134</h3>
+            </div>
+            <div class="stat-card">
+                <p>Clases Publicadas</p>
+                <h3>1</h3>
+            </div>
         </div>
-        <div class="nav-user">
-            <span id="userName">Admin</span>
-            <button onclick="logoutUser()" class="btn btn-logout">Cerrar Sesión</button>
-        </div>
-    </nav>
 
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <ul class="nav-menu">
-                <li class="nav-item active" data-section="dashboard">
-                    <span class="icon">📊</span> Dashboard
-                </li>
-                <li class="nav-item" data-section="professors">
-                    <span class="icon">👨‍</span> Profesores
-                </li>
-                <li class="nav-item" data-section="students">
-                    <span class="icon">👨‍🎓</span> Alumnos
-                </li>
-                <li class="nav-item" data-section="activity">
-                    <span class="icon">📝</span> Actividad
-                </li>
-                <li class="nav-item" data-section="settings">
-                    <span class="icon">⚙️</span> Configuración
-                </li>
-            </ul>
-        </aside>
-
-        <main class="main-content">
-            <!-- Dashboard Section -->
-            <section id="dashboardSection" class="content-section active">
-                <h2>Dashboard</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">👥</div>
-                        <div class="stat-info">
-                            <h3 id="totalUsers">0</h3>
-                            <p>Total Usuarios</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✅</div>
-                        <div class="stat-info">
-                            <h3 id="activeUsers">0</h3>
-                            <p>Usuarios Activos</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">‍🏫</div>
-                        <div class="stat-info">
-                            <h3 id="totalProfessors">0</h3>
-                            <p>Profesores</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">👨‍🎓</div>
-                        <div class="stat-info">
-                            <h3 id="totalStudents">0</h3>
-                            <p>Alumnos</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <h3>Usuarios por Rol</h3>
-                        <canvas id="usersChart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Actividad Semanal</h3>
-                        <canvas id="activityChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Professors Section -->
-            <section id="professorsSection" class="content-section">
-                <div class="section-header">
-                    <h2>Gestión de Profesores</h2>
-                    <button class="btn btn-primary" onclick="adminPanel.openUserModal('profesor')">
-                        + Agregar Profesor
-                    </button>
-                </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Clases</th>
-                                <th>Último Acceso</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="professorsTableBody">
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Students Section -->
-            <section id="studentsSection" class="content-section">
-                <div class="section-header">
-                    <h2>Gestión de Alumnos</h2>
-                    <button class="btn btn-primary" onclick="adminPanel.openUserModal('alumno')">
-                        + Agregar Alumno
-                    </button>
-                </div>
-                <div class="filters">
-                    <input type="text" id="studentSearch" placeholder="Buscar alumno..." class="search-input">
-                </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Progreso General</th>
-                                <th>Último Acceso</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentsTableBody">
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Activity Section -->
-            <section id="activitySection" class="content-section">
-                <h2>Registro de Actividad</h2>
-                <div class="filters">
-                    <input type="date" id="activityDateFrom" class="filter-input">
-                    <input type="date" id="activityDateTo" class="filter-input">
-                    <select id="activityUserFilter" class="filter-input">
-                        <option value="">Todos los usuarios</option>
-                    </select>
-                    <button class="btn btn-secondary" onclick="adminPanel.filterActivity()">Filtrar</button>
-                    <button class="btn btn-danger" onclick="adminPanel.clearOldData()">Limpiar datos antiguos</button>
-                </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Fecha/Hora</th>
-                                <th>Usuario</th>
-                                <th>Página</th>
-                                <th>Tiempo Sesión</th>
-                                <th>IP</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activityTableBody">
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Settings Section -->
-            <section id="settingsSection" class="content-section">
-                <h2>Configuración del Sistema</h2>
-                <div class="settings-card">
-                    <h3>Mantenimiento de Base de Datos</h3>
-                    <p>Limpieza automática de datos cada 6 meses</p>
-                    <button class="btn btn-warning" onclick="adminPanel.cleanDatabase()">
-                        Ejecutar limpieza ahora
-                    </button>
-                </div>
-                <div class="settings-card">
-                    <h3>Exportar Datos</h3>
-                    <button class="btn btn-secondary" onclick="adminPanel.exportData()">
-                        Exportar a JSON
-                    </button>
-                </div>
-            </section>
-        </main>
+        <h3>Última Actividad del Sistema</h3>
+        <table style="width: 100%; background: white; border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Acción</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ALUMNO001</td>
+                    <td>Alumno</td>
+                    <td>Completó Capítulo 01 (100%)</td>
+                    <td>Hoy, 10:30 AM</td>
+                </tr>
+                <tr>
+                    <td>PROFESOR01</td>
+                    <td>Profesor</td>
+                    <td>Actualizó contenido de Química Orgánica</td>
+                    <td>Ayer, 4:15 PM</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
-    <!-- Modal para Agregar/Editar Usuario -->
-    <div id="userModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="adminPanel.closeModal()">&times;</span>
-            <h2 id="modalTitle">Agregar Usuario</h2>
-            <form id="userForm">
-                <input type="hidden" id="userId">
-                <div class="form-group">
-                    <label>Nombre Completo</label>
-                    <input type="text" id="modalName" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="modalEmail" required>
-                </div>
-                <div class="form-group">
-                    <label>Rol</label>
-                    <select id="modalRole" required>
-                        <option value="alumno">Alumno</option>
-                        <option value="profesor">Profesor</option>
-                        <option value="admin">Administrador</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Contraseña</label>
-                    <input type="password" id="modalPassword" placeholder="Dejar en blanco para mantener">
-                </div>
-                <button type="submit" class="btn btn-primary">Guardar</button>
-            </form>
-        </div>
-    </div>
-
-    <script src="js/config.js"></script>
-    <script src="js/database.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/admin-panel.js"></script>
-    <script>
-        // Verificar autenticación y rol
-        document.addEventListener('DOMContentLoaded', () => {
-            const session = getCurrentSession();
-            if (!session) {
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            if (session.rol !== 'admin') {
-                const redirectMap = {
-                    'admin': 'admin.html',
-                    'profesor': 'teacher.html',
-                    'alumno': 'student.html'
-                };
-                window.location.href = redirectMap[session.rol];
-                return;
-            }
-            
-            // Actualizar nombre de usuario
-            const users = JSON.parse(localStorage.getItem('edu_platform_users')) || [];
-            const currentUser = users.find(u => u.id === session.userId);
-            if (currentUser) {
-                document.getElementById('userName').textContent = currentUser.nombre;
-            }
-        });
-    </script>
 </body>
 </html>
