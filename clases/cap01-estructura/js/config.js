@@ -1,110 +1,98 @@
-/**
- * CONFIGURACIÓN DE LA CLASE - CAPÍTULO 01
- * Basado en: "Estructura Molecular y Propiedades" (UFBI Química Orgánica)
- * 
- * INSTRUCCIONES PARA EL PROFESOR:
- * Solo necesitas editar el texto dentro de este archivo para actualizar 
- * el contenido de la clase. No toques los archivos main.js, progress.js o quiz.js.
- */
-
 const classConfig = {
-    title: "Estructura Molecular y Propiedades",
-    description: "Domina la estructura atómica, los tipos de hibridación y la relación entre la longitud y fortaleza de los enlaces covalentes.",
-    
-    // Módulos visuales en la sección Hero
     modules: [
-        { icon: "🗺️", title: "Mapa Conceptual" },
-        { icon: "🧮", title: "Herramientas Interactivas" },
-        { icon: "✏️", title: "Ejercicios" },
-        { icon: "🎯", title: "Quiz" }
+        { icon: "🗺️", title: "Conceptos", target: "concepts-section", desc: "Teoría fundamental" },
+        { icon: "🧪", title: "Laboratorio", target: "tools-section", desc: "Herramientas interactivas" },
+        { icon: "✏️", title: "Ejercicios", target: "exercises-section", desc: "Práctica guiada" },
+        { icon: "🎯", title: "Quiz", target: "quiz-section", desc: "Evalúa tu conocimiento" }
     ],
     
-    // Conceptos fundamentales (Extraídos del PDF)
     concepts: [
         {
-            title: "Valencia y Excitación del Carbono",
-            content: `
-                <p>De acuerdo a su distribución electrónica basal, el carbono debiera presentar valencia 2. Sin embargo, en la casi totalidad de sus compuestos presenta <strong>valencia 4</strong> (ej. CH₄, CCl₄).</p>
-                <p style="margin-top: 10px;">¿Cómo se resuelve esta contradicción? Mediante el proceso de <strong>excitación</strong> de un electrón del orbital 2s al orbital 2p vacío, permitiendo la formación de 4 enlaces covalentes.</p>
-            `
+            title: "La Paradoja de la Valencia del Carbono",
+            content: `<p>De acuerdo a su distribución electrónica basal, el carbono debiera presentar <strong>valencia 2</strong>. Sin embargo, en la casi totalidad de sus compuestos (CH₄, CCl₄, etc.) presenta <strong>valencia 4</strong>.</p>
+            <p style="margin-top:10px;"><strong>¿Cómo se resuelve?</strong> Mediante el proceso de <span class="highlight">excitación</span>: un electrón del orbital 2s salta a un orbital 2p vacío, generando 4 electrones desapareados listos para formar enlaces.</p>`
         },
         {
             title: "Resumen de Hibridación del Carbono",
             content: `
-                <table>
+                <table class="data-table">
                     <tr><th>Hibridación</th><th>Geometría</th><th>Rotación</th><th>Enlazado a</th><th>Orbitales p libres</th></tr>
-                    <tr><td><strong>sp³</strong></td><td>Tetraédrica</td><td>Libre</td><td>4 átomos</td><td>Ninguno</td></tr>
-                    <tr><td><strong>sp²</strong></td><td>Trigonal plana</td><td>No</td><td>3 átomos</td><td>1</td></tr>
-                    <tr><td><strong>sp</strong></td><td>Lineal</td><td>No</td><td>2 átomos</td><td>2</td></tr>
+                    <tr><td><strong>sp³</strong></td><td>Tetraédrica (109.5°)</td><td>Libre</td><td>4 átomos</td><td>Ninguno</td></tr>
+                    <tr><td><strong>sp²</strong></td><td>Trigonal plana (120°)</td><td>No</td><td>3 átomos</td><td>1 (forma enlace π)</td></tr>
+                    <tr><td><strong>sp</strong></td><td>Lineal (180°)</td><td>No</td><td>2 átomos</td><td>2 (forman 2 enlaces π)</td></tr>
                 </table>
-            `
+                <p style="margin-top:10px; font-size:0.9rem;"><em>Nota: La hibridación justifica la geometría, así como la igualdad de las longitudes y fortalezas de enlace.</em></p>`
         },
         {
             title: "Fortaleza y Longitud de Enlace",
             content: `
-                <ul style="line-height: 1.8;">
-                    <li><strong>Fortaleza:</strong> Enlace σ (sigma) > Enlace π (pi)</li>
-                    <li><strong>Fortaleza por tipo:</strong> Triple > Doble > Simple</li>
+                <ul class="rule-list">
+                    <li><strong>Fortaleza:</strong> Enlace sigma (σ) > Enlace pi (π)</li>
+                    <li><strong>Por tipo de enlace:</strong> Triple > Doble > Simple</li>
                     <li><strong>Longitud de enlace:</strong> Simple > Doble > Triple</li>
                 </ul>
-                <p style="margin-top: 10px;"><em>Nota:</em> A menor longitud de enlace, mayor es la fortaleza del mismo.</p>
-            `
+                <p style="margin-top:10px;"><strong>Conclusión:</strong> A menor longitud de enlace, mayor es la fortaleza del mismo.</p>`
         },
         {
-            title: "Heteroátomos",
-            content: `
-                <p>Cualquier átomo diferente a Carbono e Hidrógeno (O, N, Halógenos, S, etc.) que forme parte de una estructura orgánica.</p>
-                <p style="margin-top: 10px;">Usualmente aportan pares libres de electrones y poseen la misma hibridación que el carbono al que están unidos. Determinar su hibridación indica qué tipo de orbitales contienen sus pares libres.</p>
-            `
+            title: "Heteroátomos en Química Orgánica",
+            content: `<p>Cualquier átomo diferente a Carbono e Hidrógeno (O, N, Halógenos, S, etc.) que forme parte de una estructura orgánica.</p>
+            <p style="margin-top:10px;">Usualmente aportan <strong>pares libres de electrones</strong>. En la mayoría de los casos, poseen la misma hibridación que el carbono al que están unidos. Determinar su hibridación nos indica qué tipo de orbitales contienen a sus pares libres.</p>`
         }
     ],
     
-    // Ejercicios interactivos
     exercises: [
         {
-            problem: "¿Por qué el carbono presenta valencia 4 en la mayoría de sus compuestos (como CH₄) en lugar de valencia 2, que sería lo esperado por su configuración electrónica basal?",
-            solution: "Se resuelve mediante el proceso de <strong>excitación</strong>. Un electrón del orbital 2s salta a un orbital 2p vacío, generando 4 electrones desapareados listos para formar 4 enlaces covalentes. Luego, estos orbitales se <strong>hibridan</strong> para justificar la geometría y la igualdad en longitud y fortaleza de los enlaces."
+            problem: "El carbono basal tiene configuración 1s² 2s² 2p². ¿Por qué forma 4 enlaces en el metano (CH₄) en lugar de 2?",
+            solution: "Debido al proceso de <strong>excitación</strong>. Un electrón del orbital 2s se promueve al orbital 2p vacío, quedando con 4 electrones desapareados. Luego, estos orbitales se <strong>hibridan (sp³)</strong> para formar 4 enlaces sigma idénticos en longitud y fortaleza, justificando la geometría tetraédrica."
         },
         {
-            problem: "Ordena los siguientes enlaces de mayor a menor longitud: Enlace simple C-C, Enlace doble C=C, Enlace triple C≡C.",
-            solution: "El orden de <strong>mayor a menor longitud</strong> es: Enlace simple (C-C) > Enlace doble (C=C) > Enlace triple (C≡C). Esto se debe a que a mayor número de enlaces compartidos, mayor es la atracción entre los núcleos, acortando la distancia."
+            problem: "Ordena de mayor a menor longitud de enlace: C-C (simple), C=C (doble), C≡C (triple).",
+            solution: "El orden de <strong>mayor a menor longitud</strong> es: C-C (simple, ~154 pm) > C=C (doble, ~134 pm) > C≡C (triple, ~120 pm). A mayor número de enlaces compartidos, mayor es la atracción entre los núcleos, acortando la distancia."
+        },
+        {
+            problem: "¿Qué información nos aporta determinar la hibridación de un heteroátomo (como el N en una amina)?",
+            solution: "Nos indica <strong>qué tipo de orbitales contienen a sus pares libres de electrones</strong>. Por lo general, el heteroátomo adopta la misma hibridación que el carbono al que está unido, lo que es crucial para entender su reactividad y geometría."
         }
     ],
     
-    // Preguntas del quiz (Basadas en el resumen del PDF)
     quiz: [
         {
-            question: "¿Qué tipo de geometría y rotación presenta un carbono con hibridación sp²?",
-            options: ["Tetraédrica y rotación libre", "Trigonal plana y sin rotación", "Lineal y sin rotación", "Trigonal plana y rotación libre"],
+            question: "¿Qué proceso resuelve la aparente contradicción de que el carbono tenga valencia 4 en lugar de 2?",
+            options: ["La ionización", "La excitación de un electrón del orbital 2s al 2p", "La formación de enlaces iónicos", "La pérdida de un electrón"],
             correct: 1,
-            explanation: "La hibridación sp² corresponde a una geometría trigonal plana, se enlaza a 3 átomos, deja 1 orbital p libre para el enlace π, lo que impide la rotación libre."
+            explanation: "La excitación promueve un electrón del 2s al 2p vacío, generando 4 electrones desapareados disponibles para formar 4 enlaces covalentes."
         },
         {
-            question: "Según el resumen de fortaleza y longitud de enlace, ¿cuál de las siguientes afirmaciones es correcta?",
-            options: ["El enlace triple es más largo y más débil que el simple", "El enlace sigma (σ) es más débil que el enlace pi (π)", "A menor longitud de enlace, mayor fortaleza", "La longitud de enlace no afecta la fortaleza"],
-            correct: 2,
-            explanation: "El PDF establece claramente: Fortaleza (Triple > Doble > Simple) y Longitud (Simple > Doble > Triple). Por lo tanto, a menor longitud, mayor fortaleza."
+            question: "Según el resumen de hibridación, un carbono con hibridación sp² está enlazado a:",
+            options: ["4 átomos, sin orbitales p libres", "3 átomos, con 1 orbital p libre", "2 átomos, con 2 orbitales p libres", "1 átomo, con 3 orbitales p libres"],
+            correct: 1,
+            explanation: "La hibridación sp² deja 1 orbital p sin hibridar (que forma el enlace π) y se enlaza a 3 átomos con geometría trigonal plana."
         },
         {
-            question: "¿Qué son los heteroátomos en química orgánica?",
-            options: ["Átomos de carbono con hibridación sp", "Cualquier átomo diferente a Carbono e Hidrógeno (ej. O, N, S)", "Átomos que solo forman enlaces iónicos", "Orbitales p no hibridados"],
+            question: "¿Cuál es la relación correcta entre longitud y fortaleza de enlace?",
+            options: ["A mayor longitud, mayor fortaleza", "A menor longitud, mayor fortaleza", "No existe relación entre ambas", "La longitud solo depende del heteroátomo"],
             correct: 1,
-            explanation: "Los heteroátomos son cualquier átomo diferente a Carbono e Hidrógeno que forme parte de una estructura orgánica, y usualmente aportan pares libres de electrones."
+            explanation: "El PDF establece claramente: a menor longitud de enlace (ej. triple), mayor es la fortaleza (energía de enlace) del mismo."
+        },
+        {
+            question: "Los heteroátomos en una estructura orgánica son importantes porque:",
+            options: ["Siempre forman enlaces iónicos", "Aportan pares libres de electrones y su hibridación indica el orbital que los contiene", "Nunca se hibridan", "Solo pueden ser oxígeno"],
+            correct: 1,
+            explanation: "Los heteroátomos (O, N, S, etc.) usualmente aportan pares libres y su hibridación nos dice en qué tipo de orbital se encuentran esos electrones."
         }
     ],
     
-    // Nemotecnias para conceptos clave (Alta carga cognitiva)
     mnemonics: [
         {
-            title: "Regla del Número de Hibridación",
-            content: "El número en la hibridación (sp³, sp², sp) + los orbitales p libres = 3. <br>• sp³ → 0 p libres (4 enlaces, Tetraedro).<br>• sp² → 1 p libre (3 enlaces, Plano).<br>• sp → 2 p libres (2 enlaces, Lineal)."
+            title: "La Regla del Número",
+            content: "El número en la hibridación + los orbitales p libres = 3.<br>• <strong>sp³</strong> → 0 p libres (4 enlaces, Tetraedro).<br>• <strong>sp²</strong> → 1 p libre (3 enlaces, Plano).<br>• <strong>sp</strong> → 2 p libres (2 enlaces, Lineal)."
         },
         {
-            title: "Fortaleza vs. Longitud",
+            title: "El Resorte de los Enlaces",
             content: "Imagina un resorte: <br>🔗 <strong>Más corto</strong> (Triple) = <strong>Más fuerte</strong> y rígido (sin rotación).<br>🔗 <strong>Más largo</strong> (Simple) = <strong>Más débil</strong> y flexible (rotación libre)."
         },
         {
-            title: "Enlace Sigma (σ) vs Pi (π)",
+            title: "Sigma (σ) vs Pi (π)",
             content: "<strong>σ (Sigma)</strong>: Es el 'Súper' enlace, siempre está primero, es más fuerte y permite rotación.<br><strong>π (Pi)</strong>: Es el 'Plus', viene después (en dobles/triples), es más débil y <em>bloquea</em> la rotación."
         }
     ]
