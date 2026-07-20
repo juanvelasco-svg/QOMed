@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universidad - Sistema de Gestión de Cursos</title>
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <img src="images/logo.png" alt="Logo Universidad" class="login-logo">
+                <h1>Sistema de Gestión Académica</h1>
+                <p>Plataforma educativa universitaria</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Iniciar Sesión</button>
+                <button class="tab-btn" data-tab="register">Registrarse</button>
+            </div>
+
+            <!-- Formulario de Login -->
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="tu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+
+            <!-- Formulario de Registro -->
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="regName">Nombre Completo</label>
+                    <input type="text" id="regName" required placeholder="Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" required placeholder="tu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="regRole">Rol</label>
+                    <select id="regRole" required>
+                        <option value="">Selecciona un rol</option>
+                        <option value="alumno">Alumno</option>
+                        <option value="profesor">Profesor</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Contraseña</label>
+                    <input type="password" id="regPassword" required placeholder="Mínimo 6 caracteres" minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Registrarse</button>
+                <div id="registerError" class="error-message"></div>
+                <div id="registerSuccess" class="success-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        // Manejo de tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                
+                // Actualizar tabs activas
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Mostrar formulario correspondiente
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                document.getElementById(tab + 'Form').classList.add('active');
+                
+                // Limpiar mensajes
+                document.querySelectorAll('.error-message, .success-message').forEach(el => {
+                    el.style.display = 'none';
+                    el.textContent = '';
+                });
+            });
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = loginUser(email, password);
+            
+            if (!result.success) {
+                utils.showError('loginError', result.message);
+            }
+            // Si es exitoso, la redirección se hace en loginUser
+        });
+
+        // Registro
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+            
+            const result = registerUser(name, email, password, role);
+            
+            if (result.success) {
+                utils.showSuccess('registerSuccess', result.message);
+                setTimeout(() => {
+                    document.querySelector('[data-tab="login"]').click();
+                    document.getElementById('loginEmail').value = email;
+                }, 1500);
+            } else {
+                utils.showError('registerError', result.message);
+            }
+        });
+
+        // Verificar si ya hay sesión activa
+        window.addEventListener('DOMContentLoaded', () => {
+            const session = getCurrentSession();
+            if (session) {
+                const redirectMap = {
+                    'admin': 'admin.html',
+                    'profesor': 'teacher.html',
+                    'alumno': 'student.html'
+                };
+                window.location.href = redirectMap[session.rol] || 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
