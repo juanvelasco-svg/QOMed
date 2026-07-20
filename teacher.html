@@ -3,47 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel del Profesor | QOMed</title>
+    <title>Panel de Profesor</title>
     <style>
-        :root { --primary: #003366; --secondary: #D4AF37; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; }
-        header { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logout { color: white; text-decoration: none; background: #c00000; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; }
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .btn-add { background: var(--secondary); color: var(--primary); border: none; padding: 0.8rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 1rem; }
-        table { width: 100%; background: white; border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; }
+        header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logout { color: white; text-decoration: none; background: #dc2626; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .btn-add { background: #16a34a; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 1rem; }
+        table { width: 100%; background: white; border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: var(--primary); color: white; }
+        th { background: #f1f5f9; color: #334155; font-weight: 600; }
     </style>
 </head>
 <body>
     <header>
-        <strong>QOMed</strong> | Panel del Profesor
-        <a href="index.html" class="logout" onclick="localStorage.clear()">Cerrar Sesión</a>
+        <strong>Panel del Profesor</strong>
+        <a href="index.html" class="logout">Cerrar Sesión</a>
     </header>
-
     <div class="container">
-        <button class="btn-add" onclick="alert('Funcionalidad de agregar clase: Duplica la carpeta cap01 en GitHub y actualiza el config.js')">+ Agregar Nueva Clase</button>
-        
-        <h3>Mis Clases Asignadas</h3>
+        <button class="btn-add">+ Agregar Clase</button>
+        <h3>Mis Clases</h3>
         <table>
             <thead>
-                <tr>
-                    <th>Clase</th>
-                    <th>Descripción</th>
-                    <th>Alumnos Inscritos</th>
-                    <th>Progreso Promedio</th>
-                    <th>Acción</th>
-                </tr>
+                <tr><th>Clase</th><th>Descripción</th><th>Acciones</th></tr>
             </thead>
             <tbody>
                 <tr>
                     <td>Capítulo 01: Estructura Molecular</td>
-                    <td>Hibridación y enlaces covalentes</td>
-                    <td>24</td>
-                    <td>65%</td>
-                    <td><a href="clases/cap01-estructura/index.html?student_id=PROFESOR" style="color: #003366; font-weight: bold;">Vista Previa</a></td>
+                    <td>El átomo de Carbono y propiedades</td>
+                    <td><a href="clases/cap01-estructura/index.html?student_id=PROFESOR" style="color: #1e3a8a;">Vista Previa</a></td>
                 </tr>
+            </tbody>
+        </table>
+        <h3 style="margin-top: 2rem;">Progreso de Alumnos</h3>
+        <table>
+            <thead><tr><th>Alumno</th><th>Email</th><th>Progreso</th><th>Última Actividad</th><th>Acceso a Clase</th></tr></thead>
+            <tbody>
+                <tr><td>Juan Velasco</td><td>juan@uni.edu</td><td>100%</td><td>Hoy</td><td><a href="#">Ver</a></td></tr>
             </tbody>
         </table>
     </div>
