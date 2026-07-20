@@ -3,40 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administrador</title>
+    <title>Panel de Administrador | QOMed</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; }
-        header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logout { color: white; text-decoration: none; background: #dc2626; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; }
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
-        .stat-card h3 { font-size: 2rem; color: #1e3a8a; margin: 0.5rem 0; }
-        table { width: 100%; background: white; border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 2rem; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f1f5f9; color: #334155; font-weight: 600; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f1f5f9; display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #0f172a;
+            color: white;
+            padding: 1.5rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 1rem;
+        }
+        .sidebar-header h2 { color: #D4AF37; font-size: 1.3rem; }
+        .sidebar-header p { color: #94a3b8; font-size: 0.85rem; margin-top: 0.3rem; }
+        .nav-item {
+            padding: 0.9rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: #1e293b;
+            color: #D4AF37;
+            border-left: 3px solid #D4AF37;
+        }
+        .nav-item .icon { font-size: 1.2rem; }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 2rem;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .top-bar h1 { color: #1e3a8a; font-size: 1.5rem; }
+        .btn-logout {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .btn-logout:hover { background: #b91c1c; }
+
+        /* Sections */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+            border-top: 4px solid #D4AF37;
+        }
+        .stat-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .stat-card h3 { font-size: 2.2rem; color: #1e3a8a; margin: 0.5rem 0; }
+        .stat-card p { color: #64748b; font-size: 0.95rem; }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .table-header {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-header h3 { color: #1e3a8a; }
+        .btn-add {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem 1.5rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f1f5f9; color: #334155; font-weight: 600; font-size: 0.9rem; }
+        td { color: #475569; font-size: 0.9rem; }
+        .empty-row td { text-align: center; color: #94a3b8; padding: 2rem; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            border-top: 5px solid #D4AF37;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .modal-header h3 { color: #1e3a8a; }
+        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #334155; font-size: 0.9rem; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem;
+        }
+        .btn-save {
+            width: 100%; padding: 0.8rem; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { margin-left: 0; }
+            body { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
-    <header style="background:#1e3a8a; color:white; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center;">
-        <div style="display:flex; align-items:center; gap:1rem;">
-            <img src="images/logo.png" alt="Logo" style="height:40px;">
-            <strong>Panel de Administración</strong>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>QOMed Admin</h2>
+            <p>Panel de Administración</p>
         </div>
-        <a href="index.html" class="logout">Cerrar Sesión</a>
-    </header>
-    <div class="container">
-        <h2>📊 Dashboard</h2>
-        <div class="stats">
-            <div class="stat-card"><p>Total Usuarios</p><h3>0</h3></div>
-            <div class="stat-card"><p>Usuarios Activos</p><h3>0</h3></div>
-            <div class="stat-card"><p>Profesores</p><h3>0</h3></div>
-            <div class="stat-card"><p>Alumnos</p><h3>0</h3></div>
+        <div class="nav-item active" onclick="showSection('dashboard', this)">
+            <span class="icon">📊</span> Dashboard
         </div>
-        <h3>Gestión de Profesores</h3>
-        <table><thead><tr><th>Nombre</th><th>Email</th><th>Clases</th><th>Último Acceso</th><th>Acciones</th></tr></thead><tbody><tr><td colspan="5">No hay datos</td></tr></tbody></table>
-        <h3>Gestión de Alumnos</h3>
-        <table><thead><tr><th>Nombre</th><th>Email</th><th>Progreso General</th><th>Último Acceso</th><th>Acciones</th></tr></thead><tbody><tr><td colspan="5">No hay datos</td></tr></tbody></table>
+        <div class="nav-item" onclick="showSection('profesores', this)">
+            <span class="icon">‍🏫</span> Profesores
+        </div>
+        <div class="nav-item" onclick="showSection('alumnos', this)">
+            <span class="icon">👨🎓</span> Alumnos
+        </div>
+        <div class="nav-item" onclick="showSection('actividad', this)">
+            <span class="icon">📝</span> Actividad
+        </div>
+        <div class="nav-item" onclick="showSection('configuracion', this)">
+            <span class="icon">️</span> Configuración
+        </div>
     </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <h1>Panel de Administración</h1>
+            <a href="index.html" class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</a>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon">👥</div>
+                    <h3 id="stat-total">0</h3>
+                    <p>Total Usuarios</p>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">✅</div>
+                    <h3 id="stat-active">0</h3>
+                    <p>Usuarios Activos</p>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">👨‍🏫</div>
+                    <h3 id="stat-teachers">0</h3>
+                    <p>Profesores</p>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">👨‍🎓</div>
+                    <h3 id="stat-students">0</h3>
+                    <p>Alumnos</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Resumen de Usuarios Recientes</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Fecha Registro</th></tr>
+                    </thead>
+                    <tbody id="recent-users-table">
+                        <tr class="empty-row"><td colspan="4">No hay usuarios registrados</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Profesores Section -->
+        <div id="profesores" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Gestión de Profesores</h3>
+                    <button class="btn-add" onclick="openModal()">+ Agregar Profesor</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Nombre</th><th>Email</th><th>Clases Asignadas</th><th>Último Acceso</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="teachers-table">
+                        <tr class="empty-row"><td colspan="5">No hay profesores registrados</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Alumnos Section -->
+        <div id="alumnos" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Gestión de Alumnos</h3>
+                    <button class="btn-add" onclick="openModal()">+ Agregar Alumno</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Nombre</th><th>Email</th><th>Progreso General</th><th>Último Acceso</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="students-table">
+                        <tr class="empty-row"><td colspan="5">No hay alumnos registrados</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Actividad Section -->
+        <div id="actividad" class="section">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Registro de Actividad</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Fecha/Hora</th><th>Usuario</th><th>Acción</th><th>Detalles</th></tr>
+                    </thead>
+                    <tbody id="activity-table">
+                        <tr class="empty-row"><td colspan="4">No hay actividad registrada</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Configuración Section -->
+        <div id="configuracion" class="section">
+            <div class="table-container" style="padding: 2rem;">
+                <h3 style="color: #1e3a8a; margin-bottom: 1rem;">Configuración del Sistema</h3>
+                <p style="color: #64748b; margin-bottom: 1rem;">Opciones de mantenimiento y exportación de datos.</p>
+                <button class="btn-add" style="background: #dc2626;" onclick="if(confirm('¿Seguro que deseas borrar todos los datos?')){localStorage.clear(); location.reload();}">🗑️ Limpiar todos los datos</button>
+                <button class="btn-add" style="background: #16a34a; margin-left: 1rem;" onclick="exportData()">📥 Exportar datos a JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Usuario -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Agregar Usuario Manualmente</h3>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <form onsubmit="saveUser(event)">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="modal-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="modal-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select id="modal-role" required>
+                        <option value="student">Alumno</option>
+                        <option value="teacher">Profesor</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="modal-password" required minlength="6">
+                </div>
+                <button type="submit" class="btn-save">Guardar Usuario</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Navegación del Sidebar
+        function showSection(sectionId, navElement) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            navElement.classList.add('active');
+        }
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', loadAdminData);
+
+        function loadAdminData() {
+            const users = JSON.parse(localStorage.getItem('qomed_users') || '[]');
+            
+            // Actualizar contadores
+            document.getElementById('stat-total').textContent = users.length;
+            document.getElementById('stat-active').textContent = users.filter(u => u.lastLogin).length;
+            document.getElementById('stat-teachers').textContent = users.filter(u => u.role === 'teacher').length;
+            document.getElementById('stat-students').textContent = users.filter(u => u.role === 'student').length;
+
+            // Renderizar tabla de usuarios recientes (Dashboard)
+            const recentTable = document.getElementById('recent-users-table');
+            if (users.length > 0) {
+                recentTable.innerHTML = users.slice(-5).reverse().map(u => `
+                    <tr>
+                        <td>${u.name}</td>
+                        <td>${u.email}</td>
+                        <td><span style="background:${u.role==='admin'?'#fef3c7':u.role==='teacher'?'#dbeafe':'#dcfce7'}; padding:0.2rem 0.6rem; border-radius:12px; font-size:0.8rem; font-weight:600;">${getRoleName(u.role)}</span></td>
+                        <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Renderizar tabla de Profesores
+            const teachers = users.filter(u => u.role === 'teacher');
+            const teachersTable = document.getElementById('teachers-table');
+            teachersTable.innerHTML = teachers.length > 0 ? teachers.map(t => `
+                <tr>
+                    <td>${t.name}</td>
+                    <td>${t.email}</td>
+                    <td>0</td>
+                    <td>${t.lastLogin ? new Date(t.lastLogin).toLocaleDateString() : 'Nunca'}</td>
+                    <td><button style="background:#dc2626; color:white; border:none; padding:0.3rem 0.6rem; border-radius:4px; cursor:pointer;" onclick="deleteUser(${t.id})">Eliminar</button></td>
+                </tr>
+            `).join('') : '<tr class="empty-row"><td colspan="5">No hay profesores registrados</td></tr>';
+
+            // Renderizar tabla de Alumnos
+            const students = users.filter(u => u.role === 'student');
+            const studentsTable = document.getElementById('students-table');
+            studentsTable.innerHTML = students.length > 0 ? students.map(s => `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>0%</td>
+                    <td>${s.lastLogin ? new Date(s.lastLogin).toLocaleDateString() : 'Nunca'}</td>
+                    <td><button style="background:#dc2626; color:white; border:none; padding:0.3rem 0.6rem; border-radius:4px; cursor:pointer;" onclick="deleteUser(${s.id})">Eliminar</button></td>
+                </tr>
+            `).join('') : '<tr class="empty-row"><td colspan="5">No hay alumnos registrados</td></tr>';
+        }
+
+        function getRoleName(role) {
+            const roles = { student: 'Alumno', teacher: 'Profesor', admin: 'Admin' };
+            return roles[role] || role;
+        }
+
+        function deleteUser(userId) {
+            if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
+            let users = JSON.parse(localStorage.getItem('qomed_users') || '[]');
+            users = users.filter(u => u.id !== userId);
+            localStorage.setItem('qomed_users', JSON.stringify(users));
+            loadAdminData();
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('qomed_current_user');
+        }
+
+        // Modal functions
+        function openModal() { document.getElementById('userModal').classList.add('active'); }
+        function closeModal() { document.getElementById('userModal').classList.remove('active'); }
+
+        function saveUser(event) {
+            event.preventDefault();
+            const name = document.getElementById('modal-name').value;
+            const email = document.getElementById('modal-email').value.toLowerCase();
+            const role = document.getElementById('modal-role').value;
+            const password = document.getElementById('modal-password').value;
+
+            let users = JSON.parse(localStorage.getItem('qomed_users') || '[]');
+            if (users.some(u => u.email === email)) {
+                alert('Este email ya está registrado');
+                return;
+            }
+
+            users.push({
+                id: Date.now(),
+                name, email, role, password,
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            });
+            localStorage.setItem('qomed_users', JSON.stringify(users));
+            closeModal();
+            loadAdminData();
+            event.target.reset();
+        }
+
+        function exportData() {
+            const data = {
+                users: JSON.parse(localStorage.getItem('qomed_users') || '[]'),
+                exportDate: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'qomed_data_export.json';
+            a.click();
+        }
+    </script>
 </body>
 </html>
