@@ -15,7 +15,7 @@ body {
     color: var(--text-dark);
     /* RUTA CORREGIDA PARA LA IMAGEN DE FONDO */
     background: linear-gradient(rgba(30, 58, 138, 0.85), rgba(30, 58, 138, 0.9)), 
-                url('../img/fondo.jpg') no-repeat center center fixed;
+            url('../../images/fondo.jpg') no-repeat center center fixed;
     background-size: cover;
     min-height: 100vh;
     padding-top: 70px;
