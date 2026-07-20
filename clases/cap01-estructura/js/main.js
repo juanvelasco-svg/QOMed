@@ -155,3 +155,15 @@ function restartQuiz() {
         fb.innerHTML = '';
     });
 }
+// Agregaré este código en js/main.js
+document.querySelectorAll('.module-card').forEach((card, index) => {
+    card.addEventListener('click', () => {
+        // Animación de clic
+        card.classList.add('module-active');
+        setTimeout(() => card.classList.remove('module-active'), 300);
+        
+        // Desplazamiento suave a la sección
+        const sections = ['concepts-section', 'tools', 'exercises-section', 'quiz-section'];
+        document.getElementById(sections[index]).scrollIntoView({ behavior: 'smooth' });
+    });
+});
