@@ -3,47 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cap 01: Estructura Molecular y Propiedades | QOMed</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Rutas relativas a las carpetas css dentro de cap01-estructura -->
+    <title>Cap 01: Estructura Molecular | QOMed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/animations.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
-    <!-- Header Fijo -->
     <header class="header">
         <div class="logo-container">
-            <!-- Ruta corregida a la carpeta img local -->
-            <img src="img/logo.png" alt="Logo de la Universidad" class="university-logo">
+            <img src="img/logo.png" alt="Logo" class="university-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <span class="logo-fallback" style="display:none; font-weight:800; color:#003366; font-size:1.5rem;">QOMed</span>
         </div>
-        <h1 class="class-title">Estructura Molecular y Propiedades</h1>
+        <h1 class="class-title">Capítulo 01: El Átomo de Carbono</h1>
         <div class="user-controls">
             <span class="student-name" id="student-name">Cargando...</span>
-            <!-- Ruta corregida para volver a la página maestra en la raíz -->
-            <a href="../../index.html" class="btn-back" id="btn-back">⬅ Volver al Curso</a>
+            <a href="../../student.html" class="btn-back">⬅ Volver al Panel</a>
         </div>
     </header>
 
-    <!-- Sección Hero/Bienvenida -->
     <section class="hero">
         <div class="hero-content">
-            <h2>Capítulo 01: El Átomo de Carbono</h2>
-            <p class="hero-description">Domina la estructura atómica, los tipos de hibridación (sp³, sp², sp) y la relación entre la longitud y fortaleza de los enlaces covalentes.</p>
-            <div class="modules" id="modules-container">
-                <!-- Se llena dinámicamente con config.js -->
-            </div>
+            <h2>Estructura Molecular y Propiedades</h2>
+            <p class="hero-description">Domina la excitación del carbono, los tipos de hibridación (sp³, sp², sp) y la relación entre la fortaleza y longitud de los enlaces covalentes.</p>
+            
+            <!-- LOS 4 MÓDULOS AHORA SON BOTONES INTERACTIVOS -->
+            <div class="modules" id="modules-container"></div>
         </div>
     </section>
 
-    <!-- Sección de Conceptos Fundamentales -->
     <section class="concepts" id="concepts-section">
-        <!-- Contenido generado dinámicamente desde config.js -->
+        <h2>📚 Conceptos Fundamentales</h2>
+        <div class="concepts-grid" id="concepts-grid"></div>
     </section>
 
-    <!-- Sección de Herramientas Interactivas -->
-    <section class="tools">
-        <h2>Herramientas de Apoyo</h2>
+    <section class="tools" id="tools-section">
+        <h2>🧪 Laboratorio Interactivo</h2>
         <div class="tabs">
             <button class="tab active" data-tab="hybridization">Calculadora de Hibridación</button>
             <button class="tab" data-tab="bond-strength">Comparador de Enlaces</button>
@@ -51,23 +46,24 @@
         <div class="tab-content">
             <div class="tab-pane active" id="hybridization-pane">
                 <div class="hybridization-calculator">
-                    <h3>Calculadora de Hibridación del Carbono</h3>
-                    <p style="margin-bottom: 1rem; color: #666;">Ingresa el número de átomos enlazados al carbono y los pares de electrones libres.</p>
+                    <h3>Determina la Hibridación del Átomo Central</h3>
+                    <p class="hint">Suma los átomos enlazados + los pares de electrones libres del átomo central.</p>
                     <div class="calculator-inputs">
                         <div class="input-group">
-                            <label for="bonds">Átomos enlazados al C</label>
-                            <input type="number" id="bonds" min="2" max="4" value="4">
+                            <label for="bonds">Átomos enlazados al centro</label>
+                            <input type="number" id="bonds" min="1" max="6" value="4">
                         </div>
                         <div class="input-group">
                             <label for="lone-pairs">Pares de electrones libres</label>
-                            <input type="number" id="lone-pairs" min="0" max="2" value="0">
+                            <input type="number" id="lone-pairs" min="0" max="3" value="0">
                         </div>
                     </div>
                     <button class="btn-calculate" id="calculate-hybridization">Calcular Hibridación</button>
-                    <div class="result" id="hybridization-result">
-                        <p>Hibridación: <span id="hybridization-value">-</span></p>
-                        <p>Geometría: <span id="geometry-value">-</span></p>
-                        <p>Rotación: <span id="rotation-value">-</span></p>
+                    <div class="result" id="hybridization-result" style="display:none;">
+                        <div class="result-item"><span>Hibridación:</span> <strong id="hybridization-value">-</strong></div>
+                        <div class="result-item"><span>Geometría:</span> <strong id="geometry-value">-</strong></div>
+                        <div class="result-item"><span>Rotación:</span> <strong id="rotation-value">-</strong></div>
+                        <div class="result-item"><span>Orbitales p libres:</span> <strong id="p-orbitals-value">-</strong></div>
                     </div>
                 </div>
             </div>
@@ -76,74 +72,58 @@
                 <div class="bond-comparison">
                     <div class="bond-type">
                         <h4>Enlace Simple (C-C)</h4>
-                        <p>Longitud: ~154 pm</p>
-                        <div class="bond-strength">
-                            <div class="strength-bar" style="width: 40%;"></div>
-                            <span>Energía: 347 kJ/mol</span>
-                        </div>
+                        <p class="bond-length">Longitud: ~154 pm</p>
+                        <div class="bond-strength-bar"><div class="strength-fill" style="width: 40%;"></div></div>
+                        <span class="strength-text">Energía: 347 kJ/mol</span>
                     </div>
                     <div class="bond-type">
                         <h4>Enlace Doble (C=C)</h4>
-                        <p>Longitud: ~134 pm</p>
-                        <div class="bond-strength">
-                            <div class="strength-bar" style="width: 65%;"></div>
-                            <span>Energía: 614 kJ/mol</span>
-                        </div>
+                        <p class="bond-length">Longitud: ~134 pm</p>
+                        <div class="bond-strength-bar"><div class="strength-fill" style="width: 65%;"></div></div>
+                        <span class="strength-text">Energía: 614 kJ/mol</span>
                     </div>
                     <div class="bond-type">
                         <h4>Enlace Triple (C≡C)</h4>
-                        <p>Longitud: ~120 pm</p>
-                        <div class="bond-strength">
-                            <div class="strength-bar" style="width: 100%;"></div>
-                            <span>Energía: 839 kJ/mol</span>
-                        </div>
+                        <p class="bond-length">Longitud: ~120 pm</p>
+                        <div class="bond-strength-bar"><div class="strength-fill" style="width: 100%;"></div></div>
+                        <span class="strength-text">Energía: 839 kJ/mol</span>
                     </div>
                 </div>
-                <p style="margin-top: 1.5rem; text-align: center; font-style: italic; color: #555;">
-                    💡 Regla: A menor longitud de enlace, mayor fortaleza. (Triple > Doble > Simple)
-                </p>
+                <div class="rule-box">
+                    💡 <strong>Regla de Oro:</strong> A menor longitud de enlace, mayor es la fortaleza del mismo. (Triple > Doble > Simple)
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección de Ejercicios Interactivos -->
     <section class="exercises" id="exercises-section">
-        <!-- Contenido generado dinámicamente desde config.js -->
+        <h2>✏️ Ejercicios de Aplicación</h2>
+        <div id="exercises-container"></div>
     </section>
 
-    <!-- Sección de Quiz -->
     <section class="quiz" id="quiz-section">
-        <!-- Contenido generado dinámicamente desde config.js -->
+        <h2>🎯 Quiz de Autoevaluación</h2>
+        <div class="quiz-card" id="quiz-container"></div>
     </section>
 
-    <!-- Sección de Nemotecnia -->
-    <section class="mnemonics">
+    <section class="mnemonics" id="mnemonics-section">
         <h2>🧠 Nemotecnias para Conceptos Clave</h2>
-        <div class="mnemonics-grid" id="mnemonics-section">
-            <!-- Contenido generado dinámicamente desde config.js -->
-        </div>
+        <div class="mnemonics-grid" id="mnemonics-grid"></div>
     </section>
 
-    <!-- Barra de Progreso -->
     <div class="progress-bar-container">
-        <div class="progress-bar">
-            <div class="progress" id="progress-bar" style="width: 0%"></div>
-        </div>
-        <span class="progress-text">0% completado</span>
+        <div class="progress-bar"><div class="progress" id="progress-bar" style="width: 0%"></div></div>
+        <span class="progress-text" id="progress-text">0% completado</span>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
         <button class="btn-complete" id="btn-complete">✅ Marcar clase como completada y guardar progreso</button>
     </footer>
 
-    <!-- Scripts (Rutas relativas a la carpeta js local) -->
     <script src="js/config.js"></script>
     <script src="js/progress.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/quiz.js"></script>
     <script>
-        // Inicializar iconos de Lucide
         lucide.createIcons();
     </script>
 </body>
