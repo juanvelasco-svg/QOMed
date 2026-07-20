@@ -3,75 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QOMed - Sistema de Gestión de Cursos</title>
+    <title>Universidad - Sistema de Gestión de Cursos</title>
     <style>
-        :root { --primary: #003366; --secondary: #D4AF37; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h1 { color: var(--primary); margin-bottom: 0.5rem; }
-        p { color: #666; margin-bottom: 2rem; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #1e3a8a; margin-bottom: 0.5rem; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .tabs { display: flex; margin-bottom: 1.5rem; border-bottom: 2px solid #eee; }
+        .tab { flex: 1; padding: 0.8rem; text-align: center; cursor: pointer; color: #666; font-weight: 600; }
+        .tab.active { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; }
         input, select { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 0.9rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #002244; }
-        .toggle-link { margin-top: 1rem; color: var(--primary); cursor: pointer; font-size: 0.9rem; }
+        button { width: 100%; padding: 0.9rem; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #1e40af; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>QOMed</h1>
-        <p>Sistema de Gestión Académica</p>
+        <h2>Universidad</h2>
+        <p class="subtitle">Sistema de Gestión Académica<br>Plataforma educativa universitaria</p>
         
-        <!-- Formulario de Login -->
-        <div id="login-form">
-            <input type="email" id="login-email" placeholder="Email (ej: alumno@uni.edu)" required>
-            <input type="password" id="login-pass" placeholder="Contraseña" required>
-            <button onclick="login()">Ingresar</button>
-            <div class="toggle-link" onclick="toggleForms()">¿No tienes cuenta? Regístrate</div>
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('login')">Iniciar Sesión</div>
+            <div class="tab" onclick="showTab('register')">Registrarse</div>
         </div>
 
-        <!-- Formulario de Registro -->
-        <div id="register-form" class="hidden">
-            <input type="text" id="reg-name" placeholder="Nombre Completo" required>
-            <input type="email" id="reg-email" placeholder="Email" required>
-            <select id="reg-role">
+        <div id="login">
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Contraseña" required>
+            <button onclick="window.location.href='student.html'">Ingresar</button>
+        </div>
+
+        <div id="register" class="hidden">
+            <input type="text" placeholder="Nombre Completo" required>
+            <input type="email" placeholder="Email" required>
+            <select>
+                <option value="">Selecciona un rol</option>
                 <option value="student">Alumno</option>
                 <option value="teacher">Profesor</option>
+                <option value="admin">Administrador</option>
             </select>
-            <input type="password" id="reg-pass" placeholder="Contraseña" required>
-            <button onclick="register()">Registrarse</button>
-            <div class="toggle-link" onclick="toggleForms()">¿Ya tienes cuenta? Inicia Sesión</div>
+            <input type="password" placeholder="Contraseña" required>
+            <button>Registrarse</button>
         </div>
     </div>
-
     <script>
-        function toggleForms() {
-            document.getElementById('login-form').classList.toggle('hidden');
-            document.getElementById('register-form').classList.toggle('hidden');
-        }
-
-        function login() {
-            const email = document.getElementById('login-email').value;
-            if(!email) return alert("Ingresa un email");
-            // Simular ID de estudiante a partir del email
-            const studentId = email.split('@')[0].toUpperCase();
-            localStorage.setItem('qomed_user', studentId);
-            localStorage.setItem('qomed_role', 'student'); // Por defecto para la demo
-            window.location.href = 'student.html';
-        }
-
-        function register() {
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const role = document.getElementById('reg-role').value;
-            if(!name || !email) return alert("Completa todos los campos");
-            
-            const userId = email.split('@')[0].toUpperCase();
-            localStorage.setItem('qomed_user', userId);
-            localStorage.setItem('qomed_role', role);
-            
-            if(role === 'teacher') window.location.href = 'teacher.html';
-            else window.location.href = 'student.html';
+        function showTab(tab) {
+            document.getElementById('login').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('register').classList.toggle('hidden', tab !== 'register');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
         }
     </script>
 </body>
