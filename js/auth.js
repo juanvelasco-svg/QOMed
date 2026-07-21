@@ -3,6 +3,15 @@
  * Lógica de autenticación, hashing y gestión de sesiones.
  */
 
+// Importar configuración
+const CONFIG = {
+    STORAGE_KEYS: {
+        USERS: 'edu_platform_users',
+        SESSION: 'edu_platform_session'
+    },
+    SESSION_TIMEOUT: 604800000 // 7 días en milisegundos
+};
+
 // Función de hash sincrónica robusta con salting (Evita errores async en file://)
 const hashPassword = (password) => {
     const salt = "EduPlatform_Secure_Salt_2026_!";
@@ -27,7 +36,7 @@ const hashPassword = (password) => {
 // Registra un nuevo usuario
 const registerUser = (nombre, email, password, rol = 'alumno') => {
     try {
-        const users = JSON.parse(localStorage.getItem('edu_platform_users')) || [];
+        const users = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USERS)) || [];
         
         // Validar si el email ya existe
         const userExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
@@ -46,7 +55,7 @@ const registerUser = (nombre, email, password, rol = 'alumno') => {
         };
 
         users.push(newUser);
-        localStorage.setItem('edu_platform_users', JSON.stringify(users));
+        localStorage.setItem(CONFIG.STORAGE_KEYS.USERS, JSON.stringify(users));
         return { success: true, message: "Usuario registrado exitosamente." };
     } catch (error) {
         console.error("Error en registerUser:", error);
@@ -57,7 +66,7 @@ const registerUser = (nombre, email, password, rol = 'alumno') => {
 // Inicia sesión y redirige según el rol
 const loginUser = (email, password) => {
     try {
-        const users = JSON.parse(localStorage.getItem('edu_platform_users')) || [];
+        const users = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USERS)) || [];
         const user = users.find(u => u.email === email.toLowerCase());
         const hashedPassword = hashPassword(password);
 
@@ -67,16 +76,16 @@ const loginUser = (email, password) => {
 
         // Actualizar último acceso
         user.ultimoAcceso = new Date().toISOString();
-        localStorage.setItem('edu_platform_users', JSON.stringify(users));
+        localStorage.setItem(CONFIG.STORAGE_KEYS.USERS, JSON.stringify(users));
 
         // Crear sesión (7 días de expiración)
         const session = {
             userId: user.id,
             rol: user.rol,
             loginTime: new Date().toISOString(),
-            expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 días en milisegundos
+            expiresAt: Date.now() + CONFIG.SESSION_TIMEOUT // 7 días en milisegundos
         };
-        localStorage.setItem('edu_platform_session', JSON.stringify(session));
+        localStorage.setItem(CONFIG.STORAGE_KEYS.SESSION, JSON.stringify(session));
 
         // Redirección según rol
         const redirectMap = {
@@ -95,19 +104,19 @@ const loginUser = (email, password) => {
 
 // Cierra la sesión actual
 const logoutUser = () => {
-    localStorage.removeItem('edu_platform_session');
+    localStorage.removeItem(CONFIG.STORAGE_KEYS.SESSION);
     window.location.href = 'index.html';
 };
 
 // Obtiene la sesión actual si es válida
 const getCurrentSession = () => {
     try {
-        const sessionStr = localStorage.getItem('edu_platform_session');
+        const sessionStr = localStorage.getItem(CONFIG.STORAGE_KEYS.SESSION);
         if (!sessionStr) return null;
         
         const session = JSON.parse(sessionStr);
         if (Date.now() > session.expiresAt) {
-            localStorage.removeItem('edu_platform_session');
+            localStorage.removeItem(CONFIG.STORAGE_KEYS.SESSION);
             return null; // Sesión expirada
         }
         return session;

@@ -1,1 +1,5 @@
-Nothing should be ignored since the changes only include HTML files (admin.html, student.html, teacher.html) which are source code files and not build artifacts, dependencies, or temporary files.
+(js/auth.js is a source file, so no need to add anything to .gitignore)
+
+```javascript
+
+```
