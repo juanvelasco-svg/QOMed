@@ -338,6 +338,9 @@
         </div>
     </div>
 
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
     <script>
         // Navegación del Sidebar
         function showSection(sectionId, navElement) {
@@ -351,13 +354,14 @@
         document.addEventListener('DOMContentLoaded', loadAdminData);
 
         function loadAdminData() {
-            const users = JSON.parse(localStorage.getItem('qomed_users') || '[]');
+            const db = new Database();
+            const users = db.getAllUsers();
             
             // Actualizar contadores
             document.getElementById('stat-total').textContent = users.length;
             document.getElementById('stat-active').textContent = users.filter(u => u.lastLogin).length;
-            document.getElementById('stat-teachers').textContent = users.filter(u => u.role === 'teacher').length;
-            document.getElementById('stat-students').textContent = users.filter(u => u.role === 'student').length;
+            document.getElementById('stat-teachers').textContent = users.filter(u => u.role === CONFIG.ROLES.TEACHER).length;
+            document.getElementById('stat-students').textContent = users.filter(u => u.role === CONFIG.ROLES.STUDENT).length;
 
             // Renderizar tabla de usuarios recientes (Dashboard)
             const recentTable = document.getElementById('recent-users-table');
@@ -373,7 +377,7 @@
             }
 
             // Renderizar tabla de Profesores
-            const teachers = users.filter(u => u.role === 'teacher');
+            const teachers = users.filter(u => u.role === CONFIG.ROLES.TEACHER);
             const teachersTable = document.getElementById('teachers-table');
             teachersTable.innerHTML = teachers.length > 0 ? teachers.map(t => `
                 <tr>
@@ -386,7 +390,7 @@
             `).join('') : '<tr class="empty-row"><td colspan="5">No hay profesores registrados</td></tr>';
 
             // Renderizar tabla de Alumnos
-            const students = users.filter(u => u.role === 'student');
+            const students = users.filter(u => u.role === CONFIG.ROLES.STUDENT);
             const studentsTable = document.getElementById('students-table');
             studentsTable.innerHTML = students.length > 0 ? students.map(s => `
                 <tr>
@@ -400,15 +404,14 @@
         }
 
         function getRoleName(role) {
-            const roles = { student: 'Alumno', teacher: 'Profesor', admin: 'Admin' };
+            const roles = { [CONFIG.ROLES.STUDENT]: 'Alumno', [CONFIG.ROLES.TEACHER]: 'Profesor', [CONFIG.ROLES.ADMIN]: 'Admin' };
             return roles[role] || role;
         }
 
         function deleteUser(userId) {
             if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
-            let users = JSON.parse(localStorage.getItem('qomed_users') || '[]');
-            users = users.filter(u => u.id !== userId);
-            localStorage.setItem('qomed_users', JSON.stringify(users));
+            const db = new Database();
+            db.deleteUser(userId);
             loadAdminData();
         }
 
@@ -425,27 +428,21 @@
             const role = document.getElementById('modal-role').value;
             const password = document.getElementById('modal-password').value;
 
-            let users = JSON.parse(localStorage.getItem('qomed_users') || '[]');
-            if (users.some(u => u.email === email)) {
-                alert('Este email ya está registrado');
-                return;
+            const db = new Database();
+            const result = db.createUser(name, email, password, role);
+            
+            if (result.success) {
+                closeModal();
+                loadAdminData();
+                event.target.reset();
+            } else {
+                alert(result.message || 'Error al crear usuario');
             }
-
-            users.push({
-                id: Date.now(),
-                name, email, role, password,
-                createdAt: new Date().toISOString(),
-                lastLogin: null
-            });
-            localStorage.setItem('qomed_users', JSON.stringify(users));
-            closeModal();
-            loadAdminData();
-            event.target.reset();
         }
 
         function exportData() {
             const data = {
-                users: JSON.parse(localStorage.getItem('qomed_users') || '[]'),
+                users: JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USERS) || '[]'),
                 exportDate: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -456,12 +453,10 @@
             a.click();
         }
     </script>
-<script src="js/config.js"></script>
-<script src="js/auth.js"></script>
-<script>
+    <script>
 // Verificar sesión
 const session = getCurrentSession();
-if (!session || session.rol !== 'admin') {
+if (!session || session.rol !== CONFIG.ROLES.ADMIN) {
     window.location.href = 'index.html';
 }
 
