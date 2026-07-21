@@ -6,8 +6,22 @@
     <title>Panel de Administrador</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f5f6fa; min-height: 100vh; }
-        .navbar { background: #2c3e50; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%), url('images/fondo.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh; 
+        }
+        .navbar { 
+            background: rgba(44, 62, 80, 0.95); 
+            color: white; 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
         .navbar h1 { font-size: 20px; }
         .navbar-actions { display: flex; gap: 15px; align-items: center; }
         .user-info { font-size: 14px; }
@@ -35,14 +49,26 @@
         .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
         .stat-number { font-size: 32px; font-weight: bold; margin-bottom: 5px; }
         .stat-label { font-size: 14px; opacity: 0.9; }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-container img {
+            max-height: 40px;
+            width: auto;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <h1>📚 Panel de Administrador</h1>
+        <div class="logo-container">
+            <img src="images/logo.png" alt="Logo" onerror="this.style.display='none'">
+            <h1>📚 Panel de Administrador</h1>
+        </div>
         <div class="navbar-actions">
             <span class="user-info" id="user-info">Cargando...</span>
-            <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+            <button class="btn-logout" onclick="logoutUser()">Cerrar Sesión</button>
         </div>
     </nav>
 
@@ -92,31 +118,18 @@
         </div>
     </div>
 
+    <!-- Cargar scripts en orden correcto -->
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    
     <script>
-        const STORAGE_KEYS = { USERS: 'edu_users', SESSION: 'edu_session' };
-        const ROLES = { ADMIN: 'admin', TEACHER: 'profesor', STUDENT: 'alumno' };
-
-        // Verificar sesión
+        // Verificar sesión de admin
         function checkSession() {
-            const session = localStorage.getItem(STORAGE_KEYS.SESSION);
+            const session = getCurrentSession();
             if (!session) { window.location.href = 'index.html'; return null; }
-            const userSession = JSON.parse(session);
-            if (userSession.role !== ROLES.ADMIN) { window.location.href = 'index.html'; return null; }
-            return userSession;
-        }
-
-        function getUsers() {
-            const users = localStorage.getItem(STORAGE_KEYS.USERS);
-            return users ? JSON.parse(users) : [];
-        }
-
-        function saveUsers(users) {
-            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-        }
-
-        function logout() {
-            localStorage.removeItem(STORAGE_KEYS.SESSION);
-            window.location.href = 'index.html';
+            if (session.rol !== CONFIG.ROLES.ADMIN) { window.location.href = 'index.html'; return null; }
+            return session;
         }
 
         function showPanel(panelName) {
@@ -128,51 +141,55 @@
         }
 
         function getRoleBadgeClass(role) {
-            if (role === ROLES.ADMIN) return 'role-admin';
-            if (role === ROLES.TEACHER) return 'role-profesor';
-            if (role === ROLES.STUDENT) return 'role-alumno';
+            if (role === CONFIG.ROLES.ADMIN) return 'role-admin';
+            if (role === CONFIG.ROLES.TEACHER) return 'role-profesor';
+            if (role === CONFIG.ROLES.STUDENT) return 'role-alumno';
             return '';
         }
 
         function deleteUser(userId) {
             if (!confirm('¿Seguro que deseas eliminar este usuario?')) return;
-            let users = getUsers();
-            users = users.filter(u => u.id !== userId);
-            saveUsers(users);
+            db.deleteUser(userId);
             renderTables();
         }
 
         function renderTables() {
-            const users = getUsers();
+            const users = db.getUsers();
             const todosBody = document.getElementById('tabla-todos');
             const profesoresBody = document.getElementById('tabla-profesores');
             const alumnosBody = document.getElementById('tabla-alumnos');
 
             // Stats
             document.getElementById('total-users').textContent = users.length;
-            document.getElementById('total-profesores').textContent = users.filter(u => u.role === ROLES.TEACHER).length;
-            document.getElementById('total-alumnos').textContent = users.filter(u => u.role === ROLES.STUDENT).length;
+            document.getElementById('total-profesores').textContent = users.filter(u => u.rol === CONFIG.ROLES.TEACHER).length;
+            document.getElementById('total-alumnos').textContent = users.filter(u => u.rol === CONFIG.ROLES.STUDENT).length;
 
             // Render rows
             const createRow = (user) => `
                 <tr>
                     <td>${user.id}</td>
-                    <td>${user.name || 'Sin nombre'}</td>
+                    <td>${user.nombre || 'Sin nombre'}</td>
                     <td>${user.email}</td>
-                    <td><span class="role-badge ${getRoleBadgeClass(user.role)}">${user.role}</span></td>
+                    <td><span class="role-badge ${getRoleBadgeClass(user.rol)}">${user.rol}</span></td>
                     <td><button class="btn-delete" onclick="deleteUser('${user.id}')">Eliminar</button></td>
                 </tr>
             `;
 
             todosBody.innerHTML = users.map(createRow).join('');
-            profesoresBody.innerHTML = users.filter(u => u.role === ROLES.TEACHER).map(createRow).join('');
-            alumnosBody.innerHTML = users.filter(u => u.role === ROLES.STUDENT).map(createRow).join('');
+            profesoresBody.innerHTML = users.filter(u => u.rol === CONFIG.ROLES.TEACHER).map(createRow).join('');
+            alumnosBody.innerHTML = users.filter(u => u.rol === CONFIG.ROLES.STUDENT).map(createRow).join('');
         }
 
         // Init
         const session = checkSession();
         if (session) {
-            document.getElementById('user-info').textContent = `${session.name} (${session.role})`;
+            // Obtener info completa del usuario
+            const userInfo = db.getUserById(session.userId);
+            if (userInfo) {
+                document.getElementById('user-info').textContent = `${userInfo.nombre} (${userInfo.rol})`;
+            } else {
+                document.getElementById('user-info').textContent = `Admin (${session.rol})`;
+            }
             renderTables();
         }
     </script>

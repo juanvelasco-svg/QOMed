@@ -4,28 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataforma Educativa - Login</title>
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .container { background: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 400px; overflow: hidden; }
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%), url('images/fondo.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px; 
+        }
+        .container { 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3); 
+            width: 100%; 
+            max-width: 450px; 
+            overflow: hidden; 
+        }
+        .logo-container {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #667eea;
+        }
+        .logo-container img {
+            max-width: 150px;
+            height: auto;
+        }
         .tabs { display: flex; }
-        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; background: #f5f5f5; font-weight: bold; color: #666; transition: all 0.3s; }
-        .tab.active { background: white; color: #667eea; border-bottom: 2px solid #667eea; }
+        .tab { 
+            flex: 1; 
+            padding: 15px; 
+            text-align: center; 
+            cursor: pointer; 
+            background: #f5f5f5; 
+            font-weight: bold; 
+            color: #666; 
+            transition: all 0.3s; 
+        }
+        .tab.active { 
+            background: white; 
+            color: #667eea; 
+            border-bottom: 2px solid #667eea; 
+        }
         .form-container { padding: 30px; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 5px; color: #333; font-weight: 500; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; transition: border-color 0.3s; }
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            font-size: 14px; 
+            transition: border-color 0.3s; 
+        }
         input:focus, select:focus { outline: none; border-color: #667eea; }
-        button { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: background 0.3s; 
+        }
         button:hover { background: #5568d3; }
-        .message { padding: 10px; margin-top: 15px; border-radius: 5px; text-align: center; display: none; }
-        .message.success { background: #d4edda; color: #155724; display: block; }
-        .message.error { background: #f8d7da; color: #721c24; display: block; }
-        h2 { text-align: center; color: #333; margin-bottom: 25px; }
+        .message { 
+            padding: 10px; 
+            margin-top: 15px; 
+            border-radius: 5px; 
+            text-align: center; 
+            display: none; 
+        }
+        .message.success { 
+            background: #d4edda; 
+            color: #155724; 
+            display: block; 
+        }
+        .message.error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            display: block; 
+        }
+        h2 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 25px; 
+        }
+        .default-creds {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #0066cc;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="logo-container">
+            <img src="images/logo.png" alt="Logo Universidad" onerror="this.style.display='none'">
+        </div>
+        
         <div class="tabs">
             <div class="tab active" onclick="showTab('login')">Iniciar Sesión</div>
             <div class="tab" onclick="showTab('register')">Registrarse</div>
@@ -46,6 +136,10 @@
                 <button type="submit">Entrar</button>
             </form>
             <div id="login-message" class="message"></div>
+            <div class="default-creds">
+                <strong>Admin por defecto:</strong><br>
+                Email: admin@universidad.edu | Contraseña: admin123
+            </div>
         </div>
 
         <!-- Register Form -->
@@ -77,124 +171,13 @@
         </div>
     </div>
 
+    <!-- Cargar scripts en orden correcto -->
+    <script src="js/config.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    
     <script>
-        // === CONFIGURACIÓN ===
-        const STORAGE_KEYS = {
-            USERS: 'edu_users',
-            SESSION: 'edu_session'
-        };
-
-        const ROLES = {
-            ADMIN: 'admin',
-            TEACHER: 'profesor',
-            STUDENT: 'alumno'
-        };
-
-        // === UTILIDADES ===
-        function hashPassword(password) {
-            let hash = 0;
-            for (let i = 0; i < password.length; i++) {
-                const char = password.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return Math.abs(hash).toString(36);
-        }
-
-        function getUsers() {
-            const users = localStorage.getItem(STORAGE_KEYS.USERS);
-            if (!users) {
-                // Crear admin por defecto si no existe
-                const defaultAdmin = {
-                    id: 'admin-001',
-                    name: 'Administrador',
-                    email: 'admin@edu.com',
-                    password: hashPassword('admin123'),
-                    role: ROLES.ADMIN
-                };
-                localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([defaultAdmin]));
-                return [defaultAdmin];
-            }
-            return JSON.parse(users);
-        }
-
-        function saveUsers(users) {
-            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-        }
-
-        function showMessage(elementId, message, isSuccess) {
-            const el = document.getElementById(elementId);
-            el.textContent = message;
-            el.className = 'message ' + (isSuccess ? 'success' : 'error');
-            setTimeout(() => { el.className = 'message'; }, 5000);
-        }
-
-        // === AUTH ===
-        function handleRegister(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim().toLowerCase();
-            const password = document.getElementById('reg-password').value;
-            const role = document.getElementById('reg-role').value;
-
-            const users = getUsers();
-            
-            if (users.find(u => u.email === email)) {
-                showMessage('register-message', 'El email ya está registrado', false);
-                return;
-            }
-
-            const newUser = {
-                id: 'user-' + Date.now(),
-                name,
-                email,
-                password: hashPassword(password),
-                role
-            };
-
-            users.push(newUser);
-            saveUsers(users);
-
-            showMessage('register-message', 'Registro exitoso. Ahora puedes iniciar sesión.', true);
-            e.target.reset();
-            setTimeout(() => showTab('login'), 1500);
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value.trim().toLowerCase();
-            const password = document.getElementById('login-password').value;
-            const hashedPwd = hashPassword(password);
-
-            const users = getUsers();
-            const user = users.find(u => u.email === email && u.password === hashedPwd);
-
-            if (!user) {
-                showMessage('login-message', 'Email o contraseña incorrectos', false);
-                return;
-            }
-
-            // Guardar sesión
-            const session = {
-                userId: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                loginTime: new Date().toISOString()
-            };
-            localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(session));
-
-            // Redirigir según rol
-            if (user.role === ROLES.ADMIN) {
-                window.location.href = 'admin.html';
-            } else if (user.role === ROLES.TEACHER) {
-                window.location.href = 'teacher.html';
-            } else if (user.role === ROLES.STUDENT) {
-                window.location.href = 'student.html';
-            }
-        }
-
-        // === UI ===
+        // === UI Functions ===
         function showTab(tabName) {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
@@ -217,17 +200,58 @@
             document.getElementById('register-message').className = 'message';
         }
 
-        // Verificar sesión al cargar
+        function showMessage(elementId, message, isSuccess) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = 'message ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => { el.className = 'message'; }, 5000);
+        }
+
+        // === Registro usando auth.js ===
+        function handleRegister(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const rol = document.getElementById('reg-role').value;
+
+            const result = registerUser(nombre, email, password, rol);
+            
+            if (result.success) {
+                showMessage('register-message', result.message, true);
+                e.target.reset();
+                setTimeout(() => showTab('login'), 1500);
+            } else {
+                showMessage('register-message', result.message, false);
+            }
+        }
+
+        // === Login usando auth.js ===
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            const result = loginUser(email, password);
+            
+            if (!result.success) {
+                showMessage('login-message', result.message, false);
+            }
+            // Si es exitoso, loginUser ya redirige automáticamente
+        }
+
+        // === Verificar sesión al cargar ===
         window.onload = function() {
-            const session = localStorage.getItem(STORAGE_KEYS.SESSION);
+            const session = getCurrentSession();
             if (session) {
-                const userSession = JSON.parse(session);
-                if (userSession.role === ROLES.ADMIN) {
-                    window.location.href = 'admin.html';
-                } else if (userSession.role === ROLES.TEACHER) {
-                    window.location.href = 'teacher.html';
-                } else if (userSession.role === ROLES.STUDENT) {
-                    window.location.href = 'student.html';
+                const redirectMap = {
+                    'admin': 'admin.html',
+                    'profesor': 'teacher.html',
+                    'alumno': 'student.html'
+                };
+                const redirectUrl = redirectMap[session.rol];
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
                 }
             }
         };
