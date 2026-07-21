@@ -355,7 +355,7 @@
 
         function loadAdminData() {
             const db = new Database();
-            const users = db.getAllUsers();
+            const users = db.getUsers();
             
             // Actualizar contadores
             document.getElementById('stat-total').textContent = users.length;
