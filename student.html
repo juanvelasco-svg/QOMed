@@ -28,8 +28,8 @@
         <strong>Panel del Alumno</strong>
         <div>
             <span style="margin-right: 1rem;">Alumno</span>
-            <!-- CORRECCIÓN: Se agrega onclick para borrar la sesión antes de salir -->
-            <a href="index.html" class="logout" onclick="localStorage.removeItem('qomed_current_user')">Cerrar Sesión</a>
+            <!-- CORRECCIÓN: Se usa logoutUser() de auth.js -->
+            <a href="index.html" class="logout" id="logout-btn">Cerrar Sesión</a>
         </div>
     </header>
 
@@ -92,7 +92,7 @@ if (!session || session.rol !== 'alumno') {
 }
 
 // Cerrar sesión
-document.querySelector('.logout').addEventListener('click', (e) => {
+document.getElementById('logout-btn').addEventListener('click', (e) => {
     e.preventDefault();
     logoutUser();
 });
