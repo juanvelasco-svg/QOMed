@@ -1,30 +1,22 @@
 /**
  * js/auth.js
  * Lógica de autenticación, hashing y gestión de sesiones.
+ * NOTA: Este archivo debe cargarse DESPUÉS de config.js
  */
-
-// Importar configuración
-const CONFIG = {
-    STORAGE_KEYS: {
-        USERS: 'edu_platform_users',
-        SESSION: 'edu_platform_session'
-    },
-    SESSION_TIMEOUT: 604800000 // 7 días en milisegundos
-};
 
 // Función de hash sincrónica robusta con salting (Evita errores async en file://)
 const hashPassword = (password) => {
     const salt = "EduPlatform_Secure_Salt_2026_!";
     let hash = 0;
     const str = salt + password + salt;
-    
+
     // Fase 1: Hash numérico tipo DJB2 modificado
     for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
         hash = ((hash << 5) - hash) + char;
         hash = hash & hash; // Convertir a entero de 32 bits
     }
-    
+
     // Fase 2: Amplificación y ofuscación a formato hexadecimal seguro
     let amplified = Math.abs(hash).toString(16).padStart(8, '0');
     for (let i = 0; i < 100; i++) {
@@ -37,7 +29,7 @@ const hashPassword = (password) => {
 const registerUser = (nombre, email, password, rol = 'alumno') => {
     try {
         const users = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USERS)) || [];
-        
+
         // Validar si el email ya existe
         const userExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
         if (userExists) {
@@ -83,7 +75,7 @@ const loginUser = (email, password) => {
             userId: user.id,
             rol: user.rol,
             loginTime: new Date().toISOString(),
-            expiresAt: Date.now() + CONFIG.SESSION_TIMEOUT // 7 días en milisegundos
+            expiresAt: Date.now() + CONFIG.SESSION_TIMEOUT
         };
         localStorage.setItem(CONFIG.STORAGE_KEYS.SESSION, JSON.stringify(session));
 
@@ -93,7 +85,7 @@ const loginUser = (email, password) => {
             'profesor': 'teacher.html',
             'alumno': 'student.html'
         };
-        
+
         window.location.href = redirectMap[user.rol] || 'index.html';
         return { success: true, message: "Inicio de sesión exitoso." };
     } catch (error) {
@@ -113,7 +105,7 @@ const getCurrentSession = () => {
     try {
         const sessionStr = localStorage.getItem(CONFIG.STORAGE_KEYS.SESSION);
         if (!sessionStr) return null;
-        
+
         const session = JSON.parse(sessionStr);
         if (Date.now() > session.expiresAt) {
             localStorage.removeItem(CONFIG.STORAGE_KEYS.SESSION);
