@@ -3,170 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel del Profesor | QOMed</title>
+    <title>Panel del Profesor</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; }
-        header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logout { color: white; text-decoration: none; background: #dc2626; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; font-weight: bold; }
-        .logout:hover { background: #b91c1c; }
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-        .btn-add { background: #16a34a; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 1rem; }
-        .btn-add:hover { background: #15803d; }
-        table { width: 100%; background: white; border-collapse: collapse; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 2rem; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f1f5f9; color: #334155; font-weight: 600; }
-        h2 { color: #1e3a8a; margin-bottom: 1rem; font-size: 1.5rem; }
-        
-        /* Estilos del Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; border-top: 5px solid #D4AF37; }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
-        .modal-header h3 { color: #1e3a8a; }
-        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 600; color: #334155; }
-        .form-group input, .form-group textarea { width: 100%; padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; }
-        .btn-save { width: 100%; padding: 0.8rem; background: #1e3a8a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 0.5rem; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f5f6fa; min-height: 100vh; }
+        .navbar { background: #3498db; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { font-size: 20px; }
+        .navbar-actions { display: flex; gap: 15px; align-items: center; }
+        .user-info { font-size: 14px; }
+        .btn-logout { background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; }
+        .btn-logout:hover { background: #c0392b; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .panel { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-bottom: 20px; }
+        .welcome-card { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; }
+        .welcome-card h2 { color: white; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <header>
-        <strong>Panel del Profesor</strong>
-        <!-- CORRECCIÓN: Se usa logoutUser() de auth.js -->
-        <a href="index.html" class="logout" id="logout-btn">Cerrar Sesión</a>
-    </header>
+    <nav class="navbar">
+        <h1>📚 Panel del Profesor</h1>
+        <div class="navbar-actions">
+            <span class="user-info" id="user-info">Cargando...</span>
+            <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </nav>
 
     <div class="container">
-        <h2>Mis Clases</h2>
-        <button class="btn-add" onclick="openModal()">+ Agregar Clase</button>
-        
-        <table>
-            <thead>
-                <tr><th>Clase</th><th>Descripción</th><th>Acciones</th></tr>
-            </thead>
-            <tbody id="teacher-classes-table">
-                <!-- Se llena dinámicamente -->
-            </tbody>
-        </table>
-
-        <h2>Progreso de Alumnos</h2>
-        <table>
-            <thead>
-                <tr><th>Alumno</th><th>Email</th><th>Progreso</th><th>Última Actividad</th><th>Acceso a Clase</th></tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="5" style="text-align:center; color:#94a3b8;">No hay alumnos activos registrados aún.</td></tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Modal para Agregar Clase -->
-    <div id="classModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Nueva Clase</h3>
-                <button class="close-modal" onclick="closeModal()">×</button>
+        <div class="panel">
+            <div class="welcome-card">
+                <h2 id="welcome-title">Bienvenido</h2>
+                <p>Gestiona tus clases y alumnos desde aquí.</p>
             </div>
-            <form onsubmit="saveClass(event)">
-                <div class="form-group">
-                    <label>Título de la Clase</label>
-                    <input type="text" id="class-title" required placeholder="Ej: Capítulo 02: Alcanos">
-                </div>
-                <div class="form-group">
-                    <label>Descripción</label>
-                    <textarea id="class-desc" rows="3" required placeholder="Breve descripción del tema..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Enlace al Repositorio (Ruta relativa)</label>
-                    <input type="text" id="class-link" required placeholder="Ej: clases/cap02-alcanos/index.html?student_id=ALUMNO001">
-                </div>
-                <div class="form-group">
-                    <label>Color de la tarjeta (Hex)</label>
-                    <input type="color" id="class-color" value="#D4AF37">
-                </div>
-                <button type="submit" class="btn-save">Guardar Clase</button>
-            </form>
+            <p>Contenido del panel de profesor en construcción...</p>
         </div>
     </div>
 
     <script>
-        // Cargar clases al iniciar
-        document.addEventListener('DOMContentLoaded', loadTeacherClasses);
+        const STORAGE_KEYS = { USERS: 'edu_users', SESSION: 'edu_session' };
+        const ROLES = { ADMIN: 'admin', TEACHER: 'profesor', STUDENT: 'alumno' };
 
-        function loadTeacherClasses() {
-            const table = document.getElementById('teacher-classes-table');
-            let classes = JSON.parse(localStorage.getItem('qomed_classes') || '[]');
-
-            if (classes.length === 0) {
-                // Clase por defecto si el profesor no ha creado ninguna
-                classes = [{
-                    title: 'Capítulo 01: Estructura Molecular',
-                    desc: 'El átomo de Carbono, hibridación y propiedades.',
-                    link: 'clases/cap01-estructura/index.html?student_id=PROFESOR',
-                    color: '#D4AF37'
-                }];
-            }
-
-            table.innerHTML = classes.map((c, index) => `
-                <tr>
-                    <td><strong>${c.title}</strong></td>
-                    <td>${c.desc}</td>
-                    <td>
-                        <a href="${c.link}" style="color:#1e3a8a; font-weight:bold; text-decoration:none;">Vista Previa</a>
-                        <button onclick="deleteClass(${index})" style="background:#dc2626; color:white; border:none; padding:0.3rem 0.6rem; border-radius:4px; cursor:pointer; margin-left:10px;">Eliminar</button>
-                    </td>
-                </tr>
-            `).join('');
+        function checkSession() {
+            const session = localStorage.getItem(STORAGE_KEYS.SESSION);
+            if (!session) { window.location.href = 'index.html'; return null; }
+            const userSession = JSON.parse(session);
+            if (userSession.role !== ROLES.TEACHER) { window.location.href = 'index.html'; return null; }
+            return userSession;
         }
 
-        function openModal() { document.getElementById('classModal').classList.add('active'); }
-        function closeModal() { document.getElementById('classModal').classList.remove('active'); }
-
-        function saveClass(event) {
-            event.preventDefault();
-            const title = document.getElementById('class-title').value;
-            const desc = document.getElementById('class-desc').value;
-            const link = document.getElementById('class-link').value;
-            const color = document.getElementById('class-color').value;
-
-            let classes = JSON.parse(localStorage.getItem('qomed_classes') || '[]');
-            classes.push({ title, desc, link, color });
-            localStorage.setItem('qomed_classes', JSON.stringify(classes));
-
-            closeModal();
-            event.target.reset();
-            loadTeacherClasses();
+        function logout() {
+            localStorage.removeItem(STORAGE_KEYS.SESSION);
+            window.location.href = 'index.html';
         }
 
-        function deleteClass(index) {
-            if(confirm('¿Eliminar esta clase?')) {
-                let classes = JSON.parse(localStorage.getItem('qomed_classes') || '[]');
-                classes.splice(index, 1);
-                localStorage.setItem('qomed_classes', JSON.stringify(classes));
-                loadTeacherClasses();
-            }
+        const session = checkSession();
+        if (session) {
+            document.getElementById('user-info').textContent = `${session.name} (${session.role})`;
+            document.getElementById('welcome-title').textContent = `Hola, ${session.name}`;
         }
     </script>
-<script src="js/config.js"></script>
-<script src="js/auth.js"></script>
-<script>
-// Verificar sesión
-const session = getCurrentSession();
-if (!session || session.rol !== 'profesor') {
-    window.location.href = 'index.html';
-}
-
-// Cerrar sesión
-document.getElementById('logout-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    logoutUser();
-});
-
-// Modal
-function openModal() { document.querySelector('.modal').classList.add('active'); }
-function closeModal() { document.querySelector('.modal').classList.remove('active'); }
-</script>
 </body>
 </html>

@@ -3,332 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universidad - Sistema de Gestión de Cursos</title>
+    <title>Plataforma Educativa - Login</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 1rem;
-        }
-
-        .container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 420px;
-            border: 3px solid #D4AF37;
-        }
-
-        h2 {
-            text-align: center;
-            color: #1e3a8a;
-            margin-bottom: 0.5rem;
-            font-size: 1.8rem;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #64748b;
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 0.8rem;
-            text-align: center;
-            cursor: pointer;
-            color: #64748b;
-            font-weight: 600;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-        }
-
-        .tab.active {
-            color: #1e3a8a;
-            border-bottom-color: #D4AF37;
-        }
-
-        .tab:hover {
-            color: #1e3a8a;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-            position: relative;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #1e3a8a;
-        }
-
-        .password-wrapper {
-            position: relative;
-        }
-
-        .password-wrapper input {
-            padding-right: 3rem;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 0.8rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #64748b;
-            font-size: 1.2rem;
-            padding: 0.3rem;
-        }
-
-        .toggle-password:hover {
-            color: #1e3a8a;
-        }
-
-        button[type="submit"], .btn-submit {
-            width: 100%;
-            padding: 0.9rem;
-            background: #1e3a8a;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s;
-            margin-top: 0.5rem;
-        }
-
-        button[type="submit"]:hover, .btn-submit:hover {
-            background: #1e40af;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .error-message {
-            color: #dc2626;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
-
-        .success-message {
-            background: #dcfce7;
-            color: #166534;
-            padding: 0.8rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            display: none;
-            border-left: 4px solid #16a34a;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 400px; overflow: hidden; }
+        .tabs { display: flex; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; background: #f5f5f5; font-weight: bold; color: #666; transition: all 0.3s; }
+        .tab.active { background: white; color: #667eea; border-bottom: 2px solid #667eea; }
+        .form-container { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; color: #333; font-weight: 500; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; transition: border-color 0.3s; }
+        input:focus, select:focus { outline: none; border-color: #667eea; }
+        button { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button:hover { background: #5568d3; }
+        .message { padding: 10px; margin-top: 15px; border-radius: 5px; text-align: center; display: none; }
+        .message.success { background: #d4edda; color: #155724; display: block; }
+        .message.error { background: #f8d7da; color: #721c24; display: block; }
+        h2 { text-align: center; color: #333; margin-bottom: 25px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Universidad</h2>
-        <p class="subtitle">Sistema de Gestión Académica<br>Plataforma educativa universitaria</p>
-        
         <div class="tabs">
             <div class="tab active" onclick="showTab('login')">Iniciar Sesión</div>
             <div class="tab" onclick="showTab('register')">Registrarse</div>
         </div>
-
-        <!-- Formulario de Login -->
-        <form id="login-form" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <input type="email" id="login-email" placeholder="Email" required>
-            </div>
-            <div class="form-group">
-                <div class="password-wrapper">
-                    <input type="password" id="login-password" placeholder="Contraseña" required>
-                    <button type="button" class="toggle-password" onclick="togglePassword('login-password', this)">️</button>
+        
+        <!-- Login Form -->
+        <div id="login-form" class="form-container">
+            <h2>Bienvenido</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" required placeholder="tu@email.com">
                 </div>
-            </div>
-            <div class="error-message" id="login-error"></div>
-            <button type="submit">Ingresar</button>
-        </form>
-
-        <!-- Formulario de Registro -->
-        <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
-            <div class="success-message" id="register-success"></div>
-            <div class="form-group">
-                <input type="text" id="reg-name" placeholder="Nombre Completo" required>
-            </div>
-            <div class="form-group">
-                <input type="email" id="reg-email" placeholder="Email" required>
-            </div>
-            <div class="form-group">
-                <select id="reg-role" required>
-                    <option value="">Selecciona un rol</option>
-                    <option value="student">Alumno</option>
-                    <option value="teacher">Profesor</option>
-                    <option value="admin">Administrador</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <div class="password-wrapper">
-                    <input type="password" id="reg-password" placeholder="Contraseña" required>
-                    <button type="button" class="toggle-password" onclick="togglePassword('reg-password', this)">👁️</button>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
                 </div>
-            </div>
-            <div class="error-message" id="register-error"></div>
-            <button type="submit">Registrarse</button>
-        </form>
+                <button type="submit">Entrar</button>
+            </form>
+            <div id="login-message" class="message"></div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="form-container" style="display: none;">
+            <h2>Crear Cuenta</h2>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="reg-name" required placeholder="Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="reg-email" required placeholder="tu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="reg-password" required placeholder="••••••••" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select id="reg-role" required>
+                        <option value="alumno">Alumno</option>
+                        <option value="profesor">Profesor</option>
+                    </select>
+                </div>
+                <button type="submit">Registrarse</button>
+            </form>
+            <div id="register-message" class="message"></div>
+        </div>
     </div>
 
-
-    <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
     <script>
-        // Cambiar entre pestañas
-        function showTab(tab) {
-            document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
-            document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+        // === CONFIGURACIÓN ===
+        const STORAGE_KEYS = {
+            USERS: 'edu_users',
+            SESSION: 'edu_session'
+        };
 
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+        const ROLES = {
+            ADMIN: 'admin',
+            TEACHER: 'profesor',
+            STUDENT: 'alumno'
+        };
 
-            // Limpiar mensajes
-            document.getElementById('login-error').style.display = 'none';
-            document.getElementById('register-error').style.display = 'none';
-            document.getElementById('register-success').style.display = 'none';
-        }
-
-        // Mostrar/ocultar contraseña
-        function togglePassword(inputId, button) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                button.textContent = '🙈';
-            } else {
-                input.type = 'password';
-                button.textContent = '👁️';
+        // === UTILIDADES ===
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
             }
+            return Math.abs(hash).toString(36);
         }
 
-        // Manejar registro
-        function handleRegister(event) {
-            event.preventDefault();
+        function getUsers() {
+            const users = localStorage.getItem(STORAGE_KEYS.USERS);
+            if (!users) {
+                // Crear admin por defecto si no existe
+                const defaultAdmin = {
+                    id: 'admin-001',
+                    name: 'Administrador',
+                    email: 'admin@edu.com',
+                    password: hashPassword('admin123'),
+                    role: ROLES.ADMIN
+                };
+                localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([defaultAdmin]));
+                return [defaultAdmin];
+            }
+            return JSON.parse(users);
+        }
 
+        function saveUsers(users) {
+            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+        }
+
+        function showMessage(elementId, message, isSuccess) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = 'message ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => { el.className = 'message'; }, 5000);
+        }
+
+        // === AUTH ===
+        function handleRegister(e) {
+            e.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
             const email = document.getElementById('reg-email').value.trim().toLowerCase();
-            const role = document.getElementById('reg-role').value;
             const password = document.getElementById('reg-password').value;
+            const role = document.getElementById('reg-role').value;
 
-            const errorDiv = document.getElementById('register-error');
-            const successDiv = document.getElementById('register-success');
-
-            // Validaciones
-            if (!name || !email || !role || !password) {
-                errorDiv.textContent = 'Por favor completa todos los campos';
-                errorDiv.style.display = 'block';
+            const users = getUsers();
+            
+            if (users.find(u => u.email === email)) {
+                showMessage('register-message', 'El email ya está registrado', false);
                 return;
             }
 
-            if (password.length < 6) {
-                errorDiv.textContent = 'La contraseña debe tener al menos 6 caracteres';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            // Mapear roles al formato de auth.js
-            const roleMap = {
-                'student': 'alumno',
-                'teacher': 'profesor',
-                'admin': 'admin'
+            const newUser = {
+                id: 'user-' + Date.now(),
+                name,
+                email,
+                password: hashPassword(password),
+                role
             };
 
-            // Usar la función registerUser de auth.js
-            const result = registerUser(name, email, password, roleMap[role]);
-            
-            if (result.success) {
-                errorDiv.style.display = 'none';
-                successDiv.textContent = '¡Registro exitoso! Ahora puedes iniciar sesión';
-                successDiv.style.display = 'block';
+            users.push(newUser);
+            saveUsers(users);
 
-                // Limpiar formulario
-                document.getElementById('reg-name').value = '';
-                document.getElementById('reg-email').value = '';
-                document.getElementById('reg-role').value = '';
-                document.getElementById('reg-password').value = '';
-
-                // Cambiar a login después de 2 segundos
-                setTimeout(() => {
-                    document.querySelector('.tab').click();
-                }, 2000);
-            } else {
-                errorDiv.textContent = result.message;
-                errorDiv.style.display = 'block';
-            }
+            showMessage('register-message', 'Registro exitoso. Ahora puedes iniciar sesión.', true);
+            e.target.reset();
+            setTimeout(() => showTab('login'), 1500);
         }
 
-        // Manejar login
-        function handleLogin(event) {
-            event.preventDefault();
-
+        function handleLogin(e) {
+            e.preventDefault();
             const email = document.getElementById('login-email').value.trim().toLowerCase();
             const password = document.getElementById('login-password').value;
+            const hashedPwd = hashPassword(password);
 
-            const errorDiv = document.getElementById('login-error');
+            const users = getUsers();
+            const user = users.find(u => u.email === email && u.password === hashedPwd);
 
-            // Usar la función loginUser de auth.js (ya hace la redirección internamente)
-            const result = loginUser(email, password);
-            
-            if (!result.success) {
-                errorDiv.textContent = result.message;
-                errorDiv.style.display = 'block';
+            if (!user) {
+                showMessage('login-message', 'Email o contraseña incorrectos', false);
+                return;
             }
-            // Si es exitoso, loginUser() ya hace la redirección
+
+            // Guardar sesión
+            const session = {
+                userId: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(session));
+
+            // Redirigir según rol
+            if (user.role === ROLES.ADMIN) {
+                window.location.href = 'admin.html';
+            } else if (user.role === ROLES.TEACHER) {
+                window.location.href = 'teacher.html';
+            } else if (user.role === ROLES.STUDENT) {
+                window.location.href = 'student.html';
+            }
         }
 
-        // Verificar si ya hay sesión activa al cargar la página
-        window.addEventListener('DOMContentLoaded', () => {
-            const session = getCurrentSession();
-            if (session) {
-                const redirectMap = {
-                    'alumno': 'student.html',
-                    'profesor': 'teacher.html',
-                    'admin': 'admin.html'
-                };
-                window.location.href = redirectMap[session.rol] || 'index.html';
+        // === UI ===
+        function showTab(tabName) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const tabs = document.querySelectorAll('.tab');
+
+            if (tabName === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
             }
-        });
+
+            // Limpiar mensajes
+            document.getElementById('login-message').className = 'message';
+            document.getElementById('register-message').className = 'message';
+        }
+
+        // Verificar sesión al cargar
+        window.onload = function() {
+            const session = localStorage.getItem(STORAGE_KEYS.SESSION);
+            if (session) {
+                const userSession = JSON.parse(session);
+                if (userSession.role === ROLES.ADMIN) {
+                    window.location.href = 'admin.html';
+                } else if (userSession.role === ROLES.TEACHER) {
+                    window.location.href = 'teacher.html';
+                } else if (userSession.role === ROLES.STUDENT) {
+                    window.location.href = 'student.html';
+                }
+            }
+        };
     </script>
 </body>
 </html>
