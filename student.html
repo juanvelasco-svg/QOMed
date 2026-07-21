@@ -3,32 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel del Alumno</title>
+    <title>Panel del Alumno | QOMed</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; }
         header { background: #1e3a8a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logout { color: white; text-decoration: none; background: #dc2626; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; }
+        .logout { color: white; text-decoration: none; background: #dc2626; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; font-weight: bold; }
+        .logout:hover { background: #b91c1c; }
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-        .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-        .filter-btn { padding: 0.5rem 1rem; border: 1px solid #cbd5e1; background: white; border-radius: 20px; cursor: pointer; }
+        .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1rem; border: 1px solid #cbd5e1; background: white; border-radius: 20px; cursor: pointer; font-weight: 500; }
         .filter-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
-        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .card h3 { margin-top: 0; color: #1e3a8a; }
-        .btn-enter { display: inline-block; margin-top: 1rem; background: #1e3a8a; color: white; padding: 0.6rem 1.2rem; text-decoration: none; border-radius: 6px; font-size: 0.9rem; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid #D4AF37; }
+        .card h3 { margin-bottom: 0.5rem; color: #1e3a8a; }
+        .card p { color: #64748b; font-size: 0.95rem; margin-bottom: 1rem; }
+        .btn-enter { display: inline-block; background: #1e3a8a; color: white; padding: 0.6rem 1.2rem; text-decoration: none; border-radius: 6px; font-size: 0.9rem; font-weight: bold; }
+        .btn-enter:hover { background: #1e40af; }
+        h2 { color: #1e3a8a; margin-bottom: 1rem; font-size: 1.5rem; }
     </style>
 </head>
 <body>
-    <header style="background:#1e3a8a; color:white; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center;">
-        <div style="display:flex; align-items:center; gap:1rem;">
-            <img src="images/logo.png" alt="Logo" style="height:40px;">
-            <strong>Panel del Alumno</strong>
-        </div>
+    <header>
+        <strong>Panel del Alumno</strong>
         <div>
             <span style="margin-right: 1rem;">Alumno</span>
-            <a href="index.html" class="logout">Cerrar Sesión</a>
+            <!-- CORRECCIÓN: Se agrega onclick para borrar la sesión antes de salir -->
+            <a href="index.html" class="logout" onclick="localStorage.removeItem('qomed_current_user')">Cerrar Sesión</a>
         </div>
     </header>
+
     <div class="container">
         <h2>Mis Cursos</h2>
         <div class="filters">
@@ -37,19 +41,46 @@
             <button class="filter-btn">En Progreso</button>
             <button class="filter-btn">Completadas</button>
         </div>
-        <h3>Clases Disponibles</h3>
-        <div class="grid">
-            <div class="card">
-                <h3>Capítulo 01: Estructura Molecular</h3>
-                <p>El átomo de Carbono, hibridación y propiedades.</p>
-                <!-- ENLACE CORREGIDO PARA QUE FUNCIONE CON TU ID -->
-                <a href="clases/cap01-estructura/index.html?student_id=ALUMNO001" class="btn-enter">Ingresar a la Clase</a>
-            </div>
+
+        <h2>Clases Disponibles</h2>
+        <div class="grid" id="classes-grid">
+            <!-- Las clases se cargarán aquí dinámicamente -->
         </div>
-        <h3 style="margin-top: 2rem;">Mi Actividad Reciente</h3>
+
+        <h2 style="margin-top: 2rem;">Mi Actividad Reciente</h2>
         <div class="card">
             <p>No hay actividad reciente registrada.</p>
         </div>
     </div>
+
+    <script>
+        // Cargar clases desde el almacenamiento (las que el profesor cree)
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('classes-grid');
+            let classes = JSON.parse(localStorage.getItem('qomed_classes') || '[]');
+
+            // Si no hay clases creadas por el profesor, mostrar la clase por defecto
+            if (classes.length === 0) {
+                classes = [{
+                    title: 'Capítulo 01: Estructura Molecular',
+                    desc: 'El átomo de Carbono, hibridación y propiedades.',
+                    link: 'clases/cap01-estructura/index.html?student_id=ALUMNO001',
+                    color: '#D4AF37'
+                }];
+            }
+
+            // Obtener el ID del alumno actual para pasarlo a la clase
+            const currentUser = JSON.parse(localStorage.getItem('qomed_current_user') || '{}');
+            const studentId = currentUser.email ? currentUser.email.split('@')[0].toUpperCase() : 'ALUMNO001';
+
+            grid.innerHTML = classes.map(c => `
+                <div class="card" style="border-left-color: ${c.color || '#D4AF37'}">
+                    <h3>${c.title}</h3>
+                    <p>${c.desc}</p>
+                    <a href="${c.link.replace('ALUMNO001', studentId)}" class="btn-enter">Ingresar a la Clase</a>
+                </div>
+            `).join('');
+        });
+    </script>
 </body>
 </html>
