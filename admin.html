@@ -198,7 +198,7 @@
     <div class="main-content">
         <div class="top-bar">
             <h1>Panel de Administración</h1>
-            <a href="index.html" class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</a>
+            <a href="index.html" class="btn-logout" id="logout-btn">Cerrar Sesión</a>
         </div>
 
         <!-- Dashboard Section -->
@@ -412,9 +412,7 @@
             loadAdminData();
         }
 
-        function cerrarSesion() {
-            localStorage.removeItem('qomed_current_user');
-        }
+        // Función cerrarSesion eliminada - ahora se usa logoutUser() de auth.js
 
         // Modal functions
         function openModal() { document.getElementById('userModal').classList.add('active'); }
@@ -468,7 +466,7 @@ if (!session || session.rol !== 'admin') {
 }
 
 // Cerrar sesión
-document.querySelector('.logout').addEventListener('click', (e) => {
+document.getElementById('logout-btn').addEventListener('click', (e) => {
     e.preventDefault();
     logoutUser();
 });
