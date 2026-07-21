@@ -1,3 +1,23 @@
-The file changes consist only of source code files (.css, .js, .html, .md) and no build artifacts, dependencies, or temporary files. Therefore, no additional ignore rules are needed.
+```
+# Build artifacts
+dist/
+build/
+*.js.map
 
-Output: (empty)
+# Dependencies
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+```
