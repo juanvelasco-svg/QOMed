@@ -1,0 +1,117 @@
+:root {
+    /* CAMBIA ESTOS COLORES POR LOS EXACTOS DE TU LOGO */
+    --primary: #1e3a8a; /* Azul oscuro profesional */
+    --secondary: #f59e0b; /* Dorado/Ámbar para acentos */
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+    --bg-card: #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: var(--text-dark);
+    /* RUTA CORREGIDA PARA LA IMAGEN DE FONDO */
+    background: linear-gradient(rgba(30, 58, 138, 0.85), rgba(30, 58, 138, 0.9)), 
+            url('../../images/fondo.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    padding-top: 70px;
+}
+
+/* Header compacto y legible */
+.header {
+    position: fixed; top: 0; left: 0; width: 100%;
+    background: rgba(255, 255, 255, 0.98);
+    padding: 0.8rem 5%;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.university-logo { height: 40px; width: auto; }
+.class-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); flex: 1; text-align: center; margin: 0 1rem; }
+.btn-back {
+    background: var(--primary); color: white; border: none;
+    padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none;
+    font-weight: 600; font-size: 0.85rem; transition: 0.3s;
+}
+.btn-back:hover { background: #1e40af; }
+
+/* Hero Section */
+.hero { padding: 3rem 5%; color: white; text-align: center; }
+.hero h2 { font-size: 2.2rem; margin-bottom: 0.8rem; font-weight: 800; }
+.hero-description { font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9; max-width: 700px; margin-left: auto; margin-right: auto; }
+
+/* MÓDULOS: Ahora son botones compactos, con títulos claros y legibles */
+.modules { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+.module-card {
+    background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px;
+    padding: 1rem 1.5rem; text-align: center; cursor: pointer;
+    transition: all 0.3s; min-width: 140px; color: white;
+}
+.module-card:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-3px); }
+.module-icon { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+.module-card h3 { font-size: 1rem; font-weight: 700; margin: 0; }
+.module-desc { font-size: 0.8rem; opacity: 0.8; margin-top: 0.2rem; display: none; /* Oculto en móvil para limpieza */ }
+
+/* Secciones */
+section { padding: 3rem 5%; background: #f8fafc; }
+section:nth-child(even) { background: #ffffff; }
+section h2 { text-align: center; margin-bottom: 2rem; color: var(--primary); font-size: 1.8rem; }
+
+/* Conceptos */
+.concepts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.concept-card { background: var(--bg-card); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid var(--secondary); }
+.concept-header { background: var(--primary); color: white; padding: 1rem 1.2rem; font-weight: 700; font-size: 1.1rem; }
+.concept-content { padding: 1.2rem; font-size: 0.95rem; line-height: 1.6; }
+.data-table { width: 100%; border-collapse: collapse; margin-top: 0.8rem; font-size: 0.9rem; }
+.data-table th { background: #f1f5f9; padding: 0.6rem; text-align: left; border-bottom: 2px solid var(--secondary); }
+.data-table td { padding: 0.6rem; border-bottom: 1px solid #e2e8f0; }
+
+/* Herramientas */
+.tabs { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.tab { background: #e2e8f0; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; color: var(--text-light); }
+.tab.active { background: var(--primary); color: white; }
+.tab-content { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+.calculator-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.input-group label { display: block; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.9rem; }
+.input-group input { width: 100%; padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 6px; }
+.btn-calculate { background: var(--secondary); color: var(--text-dark); border: none; padding: 0.8rem; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; }
+.result { margin-top: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 6px; border-left: 4px solid var(--primary); font-size: 0.95rem; }
+
+/* Ejercicios y Quiz */
+.exercise-card, .quiz-card { background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.2rem; overflow: hidden; max-width: 800px; margin-left: auto; margin-right: auto; }
+.exercise-header, .quiz-header { background: var(--primary); color: white; padding: 0.8rem 1.2rem; font-weight: 700; }
+.exercise-content, .quiz-content { padding: 1.2rem; }
+.btn-show-answer { background: white; color: var(--primary); border: 2px solid var(--primary); padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 700; cursor: pointer; margin-top: 0.5rem; }
+.btn-show-answer:hover { background: var(--primary); color: white; }
+.answer { display: none; margin-top: 1rem; padding: 1rem; background: #f0fdf4; border-radius: 6px; border-left: 4px solid #16a34a; font-size: 0.95rem; }
+.answer.show { display: block; }
+
+.quiz-option { padding: 0.8rem; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 0.5rem; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+.quiz-option:hover { background: #f8fafc; border-color: var(--primary); }
+.quiz-option.correct { background: #dcfce7; border-color: #16a34a; color: #166534; }
+.quiz-option.incorrect { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+.quiz-feedback { margin-top: 0.8rem; padding: 0.8rem; border-radius: 6px; font-size: 0.9rem; display: none; }
+.quiz-feedback.correct { background: #dcfce7; color: #166534; display: block; }
+.quiz-feedback.incorrect { background: #fee2e2; color: #991b1b; display: block; }
+
+/* Barra de progreso */
+.progress-bar-container { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 0.8rem 5%; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 999; display: flex; align-items: center; gap: 1rem; }
+.progress-bar { flex: 1; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
+.progress { height: 100%; background: var(--secondary); width: 0%; transition: width 0.5s ease; }
+.progress-text { font-weight: 700; color: var(--primary); font-size: 0.9rem; min-width: 100px; text-align: right; }
+.footer { text-align: center; padding: 2rem 5% 5rem; background: #f8fafc; }
+.btn-complete { background: #16a34a; color: white; border: none; padding: 0.9rem 2rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; }
+
+@media (max-width: 768px) {
+    .header { flex-direction: column; gap: 0.5rem; padding: 0.8rem; }
+    .class-title { font-size: 1rem; margin: 0; }
+    .calculator-inputs { grid-template-columns: 1fr; }
+    .modules { flex-direction: column; align-items: center; }
+    .module-card { width: 100%; max-width: 300px; }
+}
