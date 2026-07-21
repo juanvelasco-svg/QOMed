@@ -369,5 +369,46 @@
             }
         });
     </script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+// Manejar Login
+document.querySelector('form').addEventListener('submit', function(e) {
+    if (this.querySelector('input[type="email"]')) {
+        e.preventDefault();
+        const email = this.querySelector('input[type="email"]').value;
+        const password = this.querySelector('input[type="password"]').value;
+        const result = loginUser(email, password);
+        if (!result.success) alert(result.message);
+    }
+});
+
+// Manejar Registro  
+document.querySelectorAll('form')[1]?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const inputs = this.querySelectorAll('input');
+    const select = this.querySelector('select');
+    const nombre = inputs[0].value;
+    const email = inputs[1].value;
+    const password = inputs[2].value;
+    const rol = select ? select.value : 'alumno';
+    
+    const result = registerUser(nombre, email, password, rol);
+    if (result.success) {
+        alert('Registro exitoso. Ahora inicia sesión');
+        document.querySelector('.tab').click();
+        this.reset();
+    } else {
+        alert(result.message);
+    }
+});
+
+// Toggle password
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+}
+</script>
 </body>
 </html>
