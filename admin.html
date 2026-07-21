@@ -458,5 +458,27 @@
             a.click();
         }
     </script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+// Verificar sesión
+const session = getCurrentSession();
+if (!session || session.rol !== 'admin') {
+    window.location.href = 'index.html';
+}
+
+// Cerrar sesión
+document.querySelector('.logout').addEventListener('click', (e) => {
+    e.preventDefault();
+    logoutUser();
+});
+
+// Cargar estadísticas
+const users = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USERS) || '[]');
+document.querySelectorAll('.stat-card h3')[0].textContent = users.length;
+document.querySelectorAll('.stat-card h3')[1].textContent = users.filter(u => u.ultimoAcceso).length;
+document.querySelectorAll('.stat-card h3')[2].textContent = users.filter(u => u.rol === 'profesor').length;
+document.querySelectorAll('.stat-card h3')[3].textContent = users.filter(u => u.rol === 'alumno').length;
+</script>
 </body>
 </html>
