@@ -35,7 +35,7 @@ body {
 /* Login Page */
 .login-page {
     background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
-    background-image: url('../images/background.jpg');
+    background-image: url('../images/background.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
