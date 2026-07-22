@@ -10,7 +10,43 @@ class TeacherPanel {
 
     init() {
         this.loadClasses();
+        this.loadStats();
         this.setupEventListeners();
+    }
+
+    loadStats() {
+        const allClasses = db.getClasses();
+        // Si es admin ve todas, si es profesor solo las suyas
+        const classes = this.session.rol === 'admin' 
+            ? allClasses 
+            : allClasses.filter(c => c.teacherId === this.session.userId);
+        
+        // Calcular estadísticas
+        let totalStudents = 0;
+        let totalProgress = 0;
+        let connectedCount = 0;
+        
+        classes.forEach(cls => {
+            const enrollments = db.getClassProgress(cls.id);
+            totalStudents += enrollments.length;
+            
+            enrollments.forEach(enr => {
+                totalProgress += enr.progress;
+            });
+            
+            // Contar clases conectadas (con al menos un alumno inscrito)
+            if (enrollments.length > 0) {
+                connectedCount++;
+            }
+        });
+        
+        const avgProgress = totalStudents > 0 ? Math.round(totalProgress / totalStudents) : 0;
+        
+        // Actualizar UI
+        document.getElementById('totalClasses').textContent = classes.length;
+        document.getElementById('totalStudents').textContent = totalStudents;
+        document.getElementById('avgProgress').textContent = avgProgress + '%';
+        document.getElementById('connectedClasses').textContent = connectedCount;
     }
 
     loadClasses() {

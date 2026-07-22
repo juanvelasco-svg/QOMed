@@ -26,7 +26,11 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: var(--bg-secondary);
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+    background-image: url('../images/background.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
@@ -34,11 +38,10 @@ body {
 
 /* Login Page */
 .login-page {
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
-    background-image: url('../images/background.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .login-page::before {
@@ -48,7 +51,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(26, 26, 46, 0.85);
+    background: rgba(26, 26, 46, 0.5);
     z-index: -1;
 }
 
@@ -61,7 +64,8 @@ body {
 }
 
 .login-box {
-    background: var(--bg-primary);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     border-radius: var(--radius);
     box-shadow: var(--shadow-hover);
     padding: 40px;
@@ -261,7 +265,8 @@ body {
 
 /* Navbar */
 .navbar {
-    background: var(--bg-primary);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     box-shadow: var(--shadow);
     padding: 0 30px;
     height: 70px;
@@ -297,11 +302,14 @@ body {
 .dashboard-container {
     display: flex;
     min-height: calc(100vh - 70px);
+    background: rgba(245, 247, 250, 0.95);
+    backdrop-filter: blur(10px);
 }
 
 .sidebar {
     width: 260px;
-    background: var(--bg-primary);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     border-right: 1px solid var(--border-color);
     padding: 30px 0;
     position: fixed;
@@ -343,7 +351,9 @@ body {
     flex: 1;
     margin-left: 260px;
     padding: 30px;
-    background: var(--bg-secondary);
+    background: rgba(245, 247, 250, 0.95);
+    backdrop-filter: blur(10px);
+    min-height: calc(100vh - 70px);
 }
 
 .content-section {
@@ -364,7 +374,8 @@ body {
 }
 
 .stat-card {
-    background: var(--bg-primary);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     padding: 25px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -715,6 +726,11 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 30px;
+    background: rgba(245, 247, 250, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius);
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .page-header {
