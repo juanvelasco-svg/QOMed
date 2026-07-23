@@ -118,8 +118,9 @@ class Database {
         return user ? JSON.parse(user) : null;
     }
 
-    getClasses() {
-        return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CLASSES) || '[]');
+   getClasses() {
+    // Devolvemos una promesa resuelta inmediatamente
+    return Promise.resolve(JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CLASSES) || '[]'));
     }
 
     getClassById(id) {
