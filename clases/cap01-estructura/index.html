@@ -2205,126 +2205,133 @@
         </section>
     </main>
 
-    <script>
+        <script>
         // ============================================
         // VARIABLES GLOBALES
         // ============================================
-        let currentUser = null;
-        let currentProgress = 0;
-        const classId = 'cap01-estructura';
-        const totalSteps = 5;
-        let completedQuizzes = new Set();
+        var currentUser = null;
+        var currentProgress = 0;
+        var classId = 'cap01-estructura';
+        var totalSteps = 5;
+        var completedQuizzes = {};
 
         // ============================================
         // INICIALIZACIÓN
         // ============================================
-        window.addEventListener('load', async () => {
-            try {
-                // Verificar si database.js está cargado
-                if (typeof db === 'undefined') {
-                    throw new Error('database.js no está cargado');
-                }
-
-                // Verificar sesión del usuario
-                currentUser = db.getCurrentUser();
-                
-                if (!currentUser) {
-                    // Redirigir al login si no hay sesión
-                    window.location.href = '../../login.html';
-                    return;
-                }
-
-                // Actualizar UI con información del usuario
-                updateUserInfo();
-
-                // Cargar progreso guardado
-                await loadProgress();
-
-                // Actualizar pasos completados
-                updateProgressSteps();
-
-                console.log('Clase cargada exitosamente para:', currentUser.name);
-
-            } catch (error) {
-                console.error('Error al inicializar la clase:', error);
-                showAlert('Error al cargar la clase. Por favor, recarga la página.', 'error');
+        window.addEventListener('load', function() {
+            // Obtener sesión del usuario
+            var sessionData = localStorage.getItem('userQOMED');
+            if (!sessionData) {
+                window.location.href = '../../index.html';
+                return;
             }
+            
+            try {
+                currentUser = JSON.parse(sessionData);
+            } catch(e) {
+                window.location.href = '../../index.html';
+                return;
+            }
+            
+            if (!currentUser) {
+                window.location.href = '../../index.html';
+                return;
+            }
+            
+            // Actualizar UI
+            updateUserInfo();
+            
+            // Cargar progreso
+            loadProgress();
+            
+            console.log('Clase cargada para:', currentUser.nombre || currentUser.email);
         });
 
         // ============================================
         // FUNCIONES DE USUARIO
         // ============================================
         function updateUserInfo() {
-            // Actualizar avatar con inicial
-            const initial = currentUser.name.charAt(0).toUpperCase();
-            document.getElementById('userAvatar').textContent = initial;
+            var nombre = currentUser.nombre || currentUser.name || 'Usuario';
+            var inicial = nombre.charAt(0).toUpperCase();
             
-            // Actualizar nombre
-            document.getElementById('userName').textContent = currentUser.name;
+            var avatarEl = document.getElementById('userAvatar');
+            var nameEl = document.getElementById('userName');
             
-            // Actualizar rol
-            const roleText = currentUser.role === 'teacher' ? 'Profesor' : 'Estudiante';
-            document.getElementById('userRole').textContent = roleText;
+            if (avatarEl) avatarEl.textContent = inicial;
+            if (nameEl) nameEl.textContent = nombre;
+            
+            // Determinar rol
+            var rol = currentUser.rol || currentUser.role || 'alumno';
+            var roleText = 'Estudiante';
+            if (rol === 'profesor' || rol === 'teacher') roleText = 'Profesor';
+            if (rol === 'admin') roleText = 'Administrador';
+            
+            var roleEl = document.getElementById('userRole');
+            if (roleEl) roleEl.textContent = roleText;
         }
 
-        async function loadProgress() {
+        function loadProgress() {
             try {
-                // Cargar progreso desde la base de datos
-                const progress = await db.getProgress(currentUser.id, classId);
+                var userId = currentUser.id || currentUser.userId;
+                var progressKey = 'progress_' + userId + '_' + classId;
+                var saved = localStorage.getItem(progressKey);
                 
-                if (progress && progress.percentage) {
-                    currentProgress = progress.percentage;
+                if (saved) {
+                    var progress = JSON.parse(saved);
+                    currentProgress = progress.percentage || 0;
                     updateProgressBar(currentProgress);
                     
-                    // Marcar quizzes completados
                     if (progress.completedQuizzes) {
-                        progress.completedQuizzes.forEach(quizNum => {
-                            completedQuizzes.add(quizNum);
-                            markQuizAsCompleted(quizNum);
+                        progress.completedQuizzes.forEach(function(qNum) {
+                            completedQuizzes[qNum] = true;
+                            markQuizAsCompleted(qNum);
                         });
                     }
                 }
-            } catch (error) {
-                console.error('Error al cargar progreso:', error);
+            } catch(e) {
+                console.error('Error al cargar progreso:', e);
             }
         }
 
         function updateProgressBar(percentage) {
-            const progressBar = document.getElementById('progressBar');
-            const progressPercent = document.getElementById('progressPercent');
+            var progressBar = document.getElementById('progressBar');
+            var progressPercent = document.getElementById('progressPercent');
             
-            progressBar.style.width = percentage + '%';
-            progressPercent.textContent = percentage + '%';
+            if (progressBar) progressBar.style.width = percentage + '%';
+            if (progressPercent) progressPercent.textContent = percentage + '%';
         }
 
-        function updateProgressSteps() {
-            const steps = document.querySelectorAll('.step');
-            const completedSteps = Math.floor((currentProgress / 100) * totalSteps);
-            
-            steps.forEach((step, index) => {
-                step.classList.remove('active', 'completed');
-                
-                if (index < completedSteps) {
-                    step.classList.add('completed');
-                } else if (index === completedSteps) {
-                    step.classList.add('active');
-                }
-            });
-        }
-
-        async function saveProgress(percentage) {
+        function saveProgress(percentage) {
             try {
                 currentProgress = percentage;
                 updateProgressBar(percentage);
-                updateProgressSteps();
                 
-                await db.saveProgress(currentUser.id, classId, percentage, {
-                    completedQuizzes: Array.from(completedQuizzes)
-                });
+                var userId = currentUser.id || currentUser.userId;
+                var progressKey = 'progress_' + userId + '_' + classId;
+                
+                var quizArray = [];
+                for (var key in completedQuizzes) {
+                    if (completedQuizzes[key]) quizArray.push(parseInt(key));
+                }
+                
+                var progressData = {
+                    percentage: percentage,
+                    completedQuizzes: quizArray,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem(progressKey, JSON.stringify(progressData));
+                
+                // También guardar en la base de datos si está disponible
+                if (typeof db !== 'undefined' && db && db.updateProgress) {
+                    try {
+                        db.updateProgress(userId, classId, percentage);
+                    } catch(e) {}
+                }
                 
                 console.log('Progreso guardado:', percentage + '%');
-            } catch (error) {
-                console.error('Error al guardar progreso:', error);
+            } catch(e) {
+                console.error('Error al guardar progreso:', e);
             }
         }
 
@@ -2332,221 +2339,138 @@
         // FUNCIONES DE QUIZ
         // ============================================
         function selectOption(element, quizNum, isCorrect) {
-            // Prevenir selección múltiple
-            const quizContainer = document.querySelector(`[data-quiz="${quizNum}"]`);
-            const options = quizContainer.querySelectorAll('.quiz-option');
+            var quizContainer = document.querySelector('[data-quiz="' + quizNum + '"]');
+            if (!quizContainer) return;
             
-            options.forEach(opt => {
+            var options = quizContainer.querySelectorAll('.quiz-option');
+            
+            options.forEach(function(opt) {
                 opt.classList.remove('selected');
                 opt.style.pointerEvents = 'none';
             });
             
             element.classList.add('selected');
             
-            // Mostrar feedback
-            const feedback = document.getElementById(`feedback${quizNum}`);
-            const nextBtn = document.getElementById(`nextBtn${quizNum}`);
+            var feedback = document.getElementById('feedback' + quizNum);
+            var nextBtn = document.getElementById('nextBtn' + quizNum);
             
             if (isCorrect) {
                 element.classList.add('correct');
-                feedback.className = 'quiz-feedback correct show';
-                feedback.innerHTML = `
-                    <strong>✓ ¡Correcto!</strong><br>
-                    Has respondido correctamente. Continúa con el siguiente tema.
-                `;
+                if (feedback) {
+                    feedback.className = 'quiz-feedback correct show';
+                    feedback.innerHTML = '<strong>✓ ¡Correcto!</strong><br>Has respondido correctamente.';
+                }
                 
-                // Marcar quiz como completado
-                if (!completedQuizzes.has(quizNum)) {
-                    completedQuizzes.add(quizNum);
-                    const progress = (completedQuizzes.size / totalSteps) * 100;
-                    saveProgress(Math.min(progress, 100));
+                if (!completedQuizzes[quizNum]) {
+                    completedQuizzes[quizNum] = true;
+                    var count = 0;
+                    for (var key in completedQuizzes) {
+                        if (completedQuizzes[key]) count++;
+                    }
+                    var progress = Math.min((count / totalSteps) * 100, 100);
+                    saveProgress(progress);
                 }
             } else {
                 element.classList.add('incorrect');
-                feedback.className = 'quiz-feedback incorrect show';
-                feedback.innerHTML = `
-                    <strong> Incorrecto</strong><br>
-                    Revisa el contenido e inténtalo de nuevo.
-                `;
+                if (feedback) {
+                    feedback.className = 'quiz-feedback incorrect show';
+                    feedback.innerHTML = '<strong>✗ Incorrecto</strong><br>Revisa el contenido e inténtalo de nuevo.';
+                }
                 
-                // Permitir reintentar después de 2 segundos
-                setTimeout(() => {
-                    options.forEach(opt => {
+                setTimeout(function() {
+                    options.forEach(function(opt) {
                         opt.classList.remove('incorrect', 'correct', 'selected');
                         opt.style.pointerEvents = 'auto';
                     });
-                    feedback.classList.remove('show');
+                    if (feedback) feedback.classList.remove('show');
                 }, 2000);
             }
             
-            nextBtn.classList.add('show');
+            if (nextBtn) nextBtn.classList.add('show');
         }
 
         function nextQuestion(currentQuiz) {
-            const nextQuiz = currentQuiz + 1;
-            const nextQuizContainer = document.querySelector(`[data-quiz="${nextQuiz}"]`);
+            var nextQuiz = currentQuiz + 1;
+            var nextContainer = document.querySelector('[data-quiz="' + nextQuiz + '"]');
             
-            if (nextQuizContainer) {
-                // Scroll suave al siguiente quiz
-                nextQuizContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Actualizar paso activo
-                const nextStep = document.querySelector(`.step[data-step="${nextQuiz}"]`);
-                if (nextStep) {
-                    nextStep.classList.add('active');
-                    nextStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
+            if (nextContainer) {
+                nextContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
-                // Ir al resumen
-                document.getElementById('summarySection').scrollIntoView({ behavior: 'smooth' });
+                var summary = document.getElementById('summarySection');
+                if (summary) summary.scrollIntoView({ behavior: 'smooth' });
             }
         }
 
         function markQuizAsCompleted(quizNum) {
-            const quizContainer = document.querySelector(`[data-quiz="${quizNum}"]`);
-            if (quizContainer) {
-                const options = quizContainer.querySelectorAll('.quiz-option');
-                options.forEach(opt => opt.style.pointerEvents = 'none');
-                
-                const nextBtn = document.getElementById(`nextBtn${quizNum}`);
-                if (nextBtn) {
-                    nextBtn.classList.add('show');
-                }
+            var container = document.querySelector('[data-quiz="' + quizNum + '"]');
+            if (container) {
+                var options = container.querySelectorAll('.quiz-option');
+                options.forEach(function(opt) { opt.style.pointerEvents = 'none'; });
+                var nextBtn = document.getElementById('nextBtn' + quizNum);
+                if (nextBtn) nextBtn.classList.add('show');
             }
         }
 
         // ============================================
-        // FUNCIONES DE INTERACCIÓN
+        // INTERACCIONES
         // ============================================
         function flipCard(card) {
             card.classList.toggle('flipped');
         }
 
         function toggleAccordion(header) {
-            const item = header.parentElement;
-            const wasActive = item.classList.contains('active');
+            var item = header.parentElement;
+            var wasActive = item.classList.contains('active');
             
-            // Cerrar todos los accordions
-            document.querySelectorAll('.accordion-item').forEach(acc => {
+            document.querySelectorAll('.accordion-item').forEach(function(acc) {
                 acc.classList.remove('active');
             });
             
-            // Abrir el clickeado si no estaba activo
             if (!wasActive) {
                 item.classList.add('active');
             }
         }
 
         // ============================================
-        // NAVEGACIÓN
+        // NAVEGACIÓN (BOTONES DEL HEADER)
         // ============================================
         function navigateBack() {
-            // Determinar a dónde volver según el rol del usuario
-            if (currentUser.role === 'teacher') {
-                window.location.href = '../../dashboard-profesor.html';
+            var rol = currentUser.rol || currentUser.role || 'alumno';
+            if (rol === 'profesor' || rol === 'teacher') {
+                window.location.href = '../../teacher.html';
+            } else if (rol === 'admin') {
+                window.location.href = '../../admin.html';
             } else {
-                window.location.href = '../../dashboard-estudiante.html';
+                window.location.href = '../../student.html';
             }
         }
 
-        async function completeClass() {
-            try {
-                showLoading(true);
-                
-                // Guardar progreso al 100%
-                await db.saveProgress(currentUser.id, classId, 100, {
-                    completedQuizzes: Array.from(completedQuizzes),
-                    completedAt: new Date().toISOString()
-                });
-                
-                // Mostrar mensaje de éxito
-                showAlert('¡Felicitaciones! Has completado el Capítulo 01. Tu progreso ha sido guardado.', 'success');
-                
-                // Esperar un momento y redirigir
-                setTimeout(() => {
+        function completeClass() {
+            if (confirm('¿Deseas marcar este capítulo como completado?')) {
+                saveProgress(100);
+                updateProgressBar(100);
+                alert('✓ ¡Felicitaciones! Has completado el Capítulo 01.');
+                setTimeout(function() {
                     navigateBack();
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Error al completar la clase:', error);
-                showAlert('Error al guardar el progreso. Por favor, intenta de nuevo.', 'error');
-            } finally {
-                showLoading(false);
+                }, 1500);
             }
         }
 
         // ============================================
-        // UTILIDADES
+        // AUTO-GUARDADO CADA 30 SEGUNDOS
         // ============================================
-        function showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
-            if (show) {
-                overlay.classList.add('show');
-            } else {
-                overlay.classList.remove('show');
-            }
-        }
-
-        function showAlert(message, type = 'info') {
-            // Crear elemento de alerta
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.style.cssText = 'position: fixed; top: 100px; right: 20px; z-index: 9999; max-width: 400px;';
-            
-            const icon = type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ';
-            alert.innerHTML = `
-                <span style="font-size: 1.5rem; margin-right: 1rem;">${icon}</span>
-                <span>${message}</span>
-            `;
-            
-            document.body.appendChild(alert);
-            
-            // Remover después de 5 segundos
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
-
-        // Observador de intersección para actualizar pasos activos
-        const observerOptions = {
-            threshold: 0.3,
-            rootMargin: '-100px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const sectionId = entry.target.id;
-                    const stepNumber = sectionId.replace('section', '');
-                    
-                    // Actualizar paso activo
-                    document.querySelectorAll('.step').forEach((step, index) => {
-                        step.classList.remove('active');
-                        if (step.dataset.step === stepNumber) {
-                            step.classList.add('active');
-                        }
-                    });
+        setInterval(function() {
+            if (currentUser && Object.keys(completedQuizzes).length > 0) {
+                var count = 0;
+                for (var key in completedQuizzes) {
+                    if (completedQuizzes[key]) count++;
                 }
-            });
-        }, observerOptions);
-
-        // Observar secciones
-        window.addEventListener('load', () => {
-            for (let i = 1; i <= 5; i++) {
-                const section = document.getElementById(`section${i}`);
-                if (section) {
-                    observer.observe(section);
-                }
-            }
-        });
-
-        // Auto-guardado cada 30 segundos
-        setInterval(() => {
-            if (currentUser && completedQuizzes.size > 0) {
-                const progress = (completedQuizzes.size / totalSteps) * 100;
-                saveProgress(Math.min(progress, 100));
+                var progress = Math.min((count / totalSteps) * 100, 100);
+                saveProgress(progress);
             }
         }, 30000);
+
+        console.log('✅ Script de clase inicializado correctamente');
     </script>
 </body>
 </html>
