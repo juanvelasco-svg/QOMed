@@ -6,6 +6,7 @@
     <title>Capítulo 01: Estructura Molecular y Propiedades | Química Orgánica</title>
     
     <!-- Database Connection -->
+    <script src="../../js/config.js"></script>
     <script src="../../js/database.js"></script>
     
     <style>
@@ -2217,7 +2218,7 @@
         // ============================================
         // INICIALIZACIÓN
         // ============================================
-        document.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('load', async () => {
             try {
                 // Verificar si database.js está cargado
                 if (typeof db === 'undefined') {
@@ -2530,7 +2531,7 @@
         }, observerOptions);
 
         // Observar secciones
-        document.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('load', () => {
             for (let i = 1; i <= 5; i++) {
                 const section = document.getElementById(`section${i}`);
                 if (section) {

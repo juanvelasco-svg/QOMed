@@ -281,4 +281,13 @@ class Database {
     }
 }
 
-const db = new Database();
+let db;
+
+window.addEventListener('load', () => {
+    try {
+        db = new Database();
+        console.log('Base de datos inicializada correctamente');
+    } catch (error) {
+        console.error('Error fatal al inicializar DB:', error);
+    }
+});
