@@ -2,7 +2,15 @@ class TeacherPanel {
     constructor() {
         this.session = getCurrentSession();
         if (!this.session || (this.session.rol !== 'profesor' && this.session.rol !== 'admin')) {
-            window.location.href = 'index.html';
+            console.warn("Acceso denegado: no es profesor ni admin");
+            if (this.session) {
+                const redirectMap = {
+                    'alumno': 'student.html'
+                };
+                window.location.href = redirectMap[this.session.rol] || 'index.html';
+            } else {
+                window.location.href = 'index.html';
+            }
             return;
         }
         this.init();
@@ -16,12 +24,11 @@ class TeacherPanel {
 
     loadStats() {
         const allClasses = db.getClasses();
-        // Si es admin ve todas, si es profesor solo las suyas
+        const userId = this.session.id || this.session.userId;
         const classes = this.session.rol === 'admin' 
             ? allClasses 
-            : allClasses.filter(c => c.teacherId === this.session.userId);
+            : allClasses.filter(c => c.teacherId === userId);
         
-        // Calcular estadísticas
         let totalStudents = 0;
         let totalProgress = 0;
         let connectedCount = 0;
@@ -34,7 +41,6 @@ class TeacherPanel {
                 totalProgress += enr.progress;
             });
             
-            // Contar clases conectadas (con al menos un alumno inscrito)
             if (enrollments.length > 0) {
                 connectedCount++;
             }
@@ -42,21 +48,27 @@ class TeacherPanel {
         
         const avgProgress = totalStudents > 0 ? Math.round(totalProgress / totalStudents) : 0;
         
-        // Actualizar UI
-        document.getElementById('totalClasses').textContent = classes.length;
-        document.getElementById('totalStudents').textContent = totalStudents;
-        document.getElementById('avgProgress').textContent = avgProgress + '%';
-        document.getElementById('connectedClasses').textContent = connectedCount;
+        const totalClassesEl = document.getElementById('totalClasses');
+        const totalStudentsEl = document.getElementById('totalStudents');
+        const avgProgressEl = document.getElementById('avgProgress');
+        const connectedClassesEl = document.getElementById('connectedClasses');
+        
+        if (totalClassesEl) totalClassesEl.textContent = classes.length;
+        if (totalStudentsEl) totalStudentsEl.textContent = totalStudents;
+        if (avgProgressEl) avgProgressEl.textContent = avgProgress + '%';
+        if (connectedClassesEl) connectedClassesEl.textContent = connectedCount;
     }
 
     loadClasses() {
         const allClasses = db.getClasses();
-        // Si es admin ve todas, si es profesor solo las suyas
+        const userId = this.session.id || this.session.userId;
         const classes = this.session.rol === 'admin' 
             ? allClasses 
-            : allClasses.filter(c => c.teacherId === this.session.userId);
+            : allClasses.filter(c => c.teacherId === userId);
         
         const grid = document.getElementById('classesGrid');
+        if (!grid) return;
+        
         grid.innerHTML = '';
 
         if (classes.length === 0) {
@@ -105,6 +117,8 @@ class TeacherPanel {
     openClassModal(classId = null) {
         const modal = document.getElementById('classModal');
         const form = document.getElementById('classForm');
+        if (!modal || !form) return;
+        
         form.reset();
         
         if (classId) {
@@ -141,6 +155,8 @@ class TeacherPanel {
         document.getElementById('progressClassName').textContent = classItem.title;
         const enrollments = db.getClassProgress(classId);
         const tbody = document.getElementById('progressTableBody');
+        if (!tbody) return;
+        
         tbody.innerHTML = '';
 
         if (enrollments.length === 0) {
@@ -167,14 +183,24 @@ class TeacherPanel {
         document.getElementById('progressModal').classList.add('active');
     }
 
-    closeProgressModal() { document.getElementById('progressModal').classList.remove('active'); }
-    closeModal() { document.getElementById('classModal').classList.remove('active'); }
+    closeProgressModal() { 
+        const modal = document.getElementById('progressModal');
+        if (modal) modal.classList.remove('active'); 
+    }
+    
+    closeModal() { 
+        const modal = document.getElementById('classModal');
+        if (modal) modal.classList.remove('active'); 
+    }
 
     setupEventListeners() {
-        document.getElementById('classForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.saveClass();
-        });
+        const classForm = document.getElementById('classForm');
+        if (classForm) {
+            classForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.saveClass();
+            });
+        }
 
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) e.target.classList.remove('active');
@@ -183,12 +209,13 @@ class TeacherPanel {
 
     saveClass() {
         const classId = document.getElementById('classId').value;
+        const userId = this.session.id || this.session.userId;
         const classData = {
             title: document.getElementById('classTitle').value,
             description: document.getElementById('classDescription').value,
             link: document.getElementById('classLink').value,
             color: document.getElementById('classColor').value,
-            teacherId: this.session.userId
+            teacherId: userId
         };
 
         try {
@@ -207,4 +234,12 @@ class TeacherPanel {
     }
 }
 
-const teacherPanel = new TeacherPanel();
+// Inicialización SEGURA - Solo si estamos en teacher.html o admin.html
+if (window.location.pathname.includes('teacher.html') || 
+    (window.location.pathname.includes('admin.html') && getCurrentSession()?.rol === 'profesor')) {
+    window.addEventListener('load', () => {
+        if (!window.teacherPanel) {
+            window.teacherPanel = new TeacherPanel();
+        }
+    });
+}
