@@ -2,11 +2,6 @@
  * ============================================
  * TEACHER PANEL - QOMed Platform
  * ============================================
- * Dashboard completo con:
- * - Gestión de clases
- * - Actividad de estudiantes
- * - Registro de accesos
- * - Lista de estudiantes
  */
 
 class TeacherPanel {
@@ -22,7 +17,7 @@ class TeacherPanel {
 
     redirectUnauthorized() {
         if (this.session) {
-            const redirectMap = {
+            var redirectMap = {
                 'alumno': 'student.html',
                 'admin': 'admin.html'
             };
@@ -40,103 +35,113 @@ class TeacherPanel {
         this.populateFilters();
     }
 
-    // ============================================
-    // NAVEGACIÓN
-    // ============================================
     setupNavigation() {
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const section = item.dataset.section;
+        var self = this;
+        document.querySelectorAll('.nav-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                var section = this.dataset.section;
                 
-                // Actualizar menú
-                document.querySelectorAll('.nav-item').forEach(ni => ni.classList.remove('active'));
-                item.classList.add('active');
+                document.querySelectorAll('.nav-item').forEach(function(ni) {
+                    ni.classList.remove('active');
+                });
+                this.classList.add('active');
                 
-                // Mostrar sección
-                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-                const sectionEl = document.getElementById(`${section}Section`);
+                document.querySelectorAll('.content-section').forEach(function(s) {
+                    s.classList.remove('active');
+                });
+                
+                var sectionEl = document.getElementById(section + 'Section');
                 if (sectionEl) {
                     sectionEl.classList.add('active');
-                    
-                    // Cargar datos según sección
-                    if (section === 'activity') this.loadStudentActivity();
-                    if (section === 'access') this.loadAccessLog();
-                    if (section === 'students') this.loadStudentsList();
+                    if (section === 'activity') self.loadStudentActivity();
+                    if (section === 'access') self.loadAccessLog();
+                    if (section === 'students') self.loadStudentsList();
                 }
             });
         });
     }
 
-    // ============================================
-    // FILTROS
-    // ============================================
     populateFilters() {
-        const myClasses = this.getMyClasses();
+        var myClasses = this.getMyClasses();
+        var self = this;
         
-        // Poblar todos los select de clase
-        ['activityClassFilter', 'accessClassFilter', 'studentClassFilter'].forEach(filterId => {
-            const select = document.getElementById(filterId);
+        ['activityClassFilter', 'accessClassFilter', 'studentClassFilter'].forEach(function(filterId) {
+            var select = document.getElementById(filterId);
             if (select) {
                 select.innerHTML = '<option value="">Todas las clases</option>';
-                myClasses.forEach(cls => {
-                    select.innerHTML += `<option value="${cls.id}">${cls.title}</option>`;
+                myClasses.forEach(function(cls) {
+                    select.innerHTML += '<option value="' + cls.id + '">' + cls.title + '</option>';
                 });
             }
         });
         
-        // Poblar filtro de estudiantes
-        const allEnrollments = this.getAllEnrollments();
-        const studentIds = [...new Set(allEnrollments.map(e => e.studentId))];
-        const accessStudentFilter = document.getElementById('accessStudentFilter');
+        var allEnrollments = this.getAllEnrollments();
+        var studentIds = [];
+        allEnrollments.forEach(function(e) {
+            if (studentIds.indexOf(e.studentId) === -1) {
+                studentIds.push(e.studentId);
+            }
+        });
+        
+        var accessStudentFilter = document.getElementById('accessStudentFilter');
         if (accessStudentFilter) {
             accessStudentFilter.innerHTML = '<option value="">Todos los estudiantes</option>';
-            studentIds.forEach(id => {
-                const student = db.getUserById(id);
+            studentIds.forEach(function(id) {
+                var student = db.getUserById(id);
                 if (student) {
-                    accessStudentFilter.innerHTML += `<option value="${id}">${student.nombre}</option>`;
+                    accessStudentFilter.innerHTML += '<option value="' + id + '">' + student.nombre + '</option>';
                 }
             });
         }
     }
 
-    // ============================================
-    // SECCIÓN 1: CLASES
-    // ============================================
     getMyClasses() {
-        const allClasses = db.getClasses();
-        const userId = this.session.id || this.session.userId;
-        return this.session.rol === 'admin' 
-            ? allClasses 
-            : allClasses.filter(c => c.teacherId === userId);
+        var allClasses = db.getClasses();
+        var userId = this.session.id || this.session.userId;
+        if (this.session.rol === 'admin') {
+            return allClasses;
+        }
+        return allClasses.filter(function(c) {
+            return c.teacherId === userId;
+        });
     }
 
     getAllEnrollments() {
-        const myClasses = this.getMyClasses();
-        const myClassIds = myClasses.map(c => c.id);
-        const allEnrollments = db.getEnrollments();
-        return allEnrollments.filter(e => myClassIds.includes(e.classId));
+        var myClasses = this.getMyClasses();
+        var myClassIds = myClasses.map(function(c) { return c.id; });
+        var allEnrollments = db.getEnrollments();
+        return allEnrollments.filter(function(e) {
+            return myClassIds.indexOf(e.classId) !== -1;
+        });
     }
 
     getMyStudents() {
-        const enrollments = this.getAllEnrollments();
-        const studentIds = [...new Set(enrollments.map(e => e.studentId))];
-        return studentIds.map(id => db.getUserById(id)).filter(Boolean);
+        var enrollments = this.getAllEnrollments();
+        var studentIds = [];
+        enrollments.forEach(function(e) {
+            if (studentIds.indexOf(e.studentId) === -1) {
+                studentIds.push(e.studentId);
+            }
+        });
+        return studentIds.map(function(id) {
+            return db.getUserById(id);
+        }).filter(Boolean);
     }
 
     loadStats() {
-        const classes = this.getMyClasses();
-        const enrollments = this.getAllEnrollments();
+        var classes = this.getMyClasses();
+        var enrollments = this.getAllEnrollments();
         
-        let totalStudents = enrollments.length;
-        let totalProgress = 0;
-        let completedCount = 0;
+        var totalStudents = enrollments.length;
+        var totalProgress = 0;
+        var completedCount = 0;
         
-        enrollments.forEach(enr => {
+        enrollments.forEach(function(enr) {
             totalProgress += enr.progress || 0;
             if (enr.completed) completedCount++;
         });
         
-        const avgProgress = totalStudents > 0 ? Math.round(totalProgress / totalStudents) : 0;
+        var avgProgress = totalStudents > 0 ? Math.round(totalProgress / totalStudents) : 0;
         
         document.getElementById('totalClasses').textContent = classes.length;
         document.getElementById('totalStudents').textContent = totalStudents;
@@ -145,8 +150,8 @@ class TeacherPanel {
     }
 
     loadClasses() {
-        const classes = this.getMyClasses();
-        const grid = document.getElementById('classesGrid');
+        var classes = this.getMyClasses();
+        var grid = document.getElementById('classesGrid');
         if (!grid) return;
         
         grid.innerHTML = '';
@@ -156,61 +161,57 @@ class TeacherPanel {
             return;
         }
 
-        classes.forEach(classItem => {
-            grid.appendChild(this.createClassCard(classItem));
+        var self = this;
+        classes.forEach(function(classItem) {
+            grid.appendChild(self.createClassCard(classItem));
         });
     }
 
     createClassCard(classItem) {
-        const enrollments = db.getClassProgress(classItem.id);
-        const studentsCount = enrollments.length;
-        const avgProgress = utils.calculateAverageProgress(enrollments);
-        const completedCount = enrollments.filter(e => e.completed).length;
+        var enrollments = db.getClassProgress(classItem.id);
+        var studentsCount = enrollments.length;
+        var avgProgress = utils.calculateAverageProgress(enrollments);
+        var completedCount = enrollments.filter(function(e) { return e.completed; }).length;
 
-        const div = document.createElement('div');
+        var div = document.createElement('div');
         div.className = 'class-card';
         div.style.borderTopColor = classItem.color || '#FFD700';
         
-        div.innerHTML = `
-            <div class="class-card-header" style="background: linear-gradient(135deg, ${classItem.color}22 0%, transparent 100%);">
-                <h3>${classItem.title}</h3>
-                <p>${utils.truncate(classItem.description, 100)}</p>
-            </div>
-            <div class="class-card-body">
-                <div class="class-stats">
-                    <span>👥 ${studentsCount} alumnos</span>
-                    <span>✅ ${completedCount} completados</span>
-                </div>
-                <div class="class-stats">
-                    <span>📊 ${avgProgress}% promedio</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${avgProgress}%"></div>
-                </div>
-                <div class="class-actions">
-                    <button class="btn btn-secondary" onclick="teacherPanel.viewProgress('${classItem.id}')">👁 Progreso</button>
-                    <button class="btn btn-secondary" onclick="teacherPanel.editClass('${classItem.id}')">✏️ Editar</button>
-                    <button class="btn btn-danger" onclick="teacherPanel.deleteClass('${classItem.id}')">🗑️ Eliminar</button>
-                </div>
-            </div>
-        `;
+        div.innerHTML = '' +
+            '<div class="class-card-header" style="background: linear-gradient(135deg, ' + classItem.color + '22 0%, transparent 100%);">' +
+                '<h3>' + classItem.title + '</h3>' +
+                '<p>' + utils.truncate(classItem.description, 100) + '</p>' +
+            '</div>' +
+            '<div class="class-card-body">' +
+                '<div class="class-stats">' +
+                    '<span>👥 ' + studentsCount + ' alumnos</span>' +
+                    '<span>✅ ' + completedCount + ' completados</span>' +
+                '</div>' +
+                '<div class="class-stats">' +
+                    '<span>📊 ' + avgProgress + '% promedio</span>' +
+                '</div>' +
+                '<div class="progress-bar">' +
+                    '<div class="progress-fill" style="width: ' + avgProgress + '%"></div>' +
+                '</div>' +
+                '<div class="class-actions">' +
+                    '<button class="btn btn-secondary" onclick="teacherPanel.viewProgress(\'' + classItem.id + '\')">👁 Progreso</button>' +
+                    '<button class="btn btn-secondary" onclick="teacherPanel.editClass(\'' + classItem.id + '\')">✏️ Editar</button>' +
+                    '<button class="btn btn-danger" onclick="teacherPanel.deleteClass(\'' + classItem.id + '\')">🗑️ Eliminar</button>' +
+                '</div>' +
+            '</div>';
         return div;
     }
 
-    // ============================================
-    // SECCIÓN 2: ACTIVIDAD DE ESTUDIANTES
-    // ============================================
     loadStudentActivity() {
-        const classFilter = document.getElementById('activityClassFilter')?.value;
-        const enrollments = this.getAllEnrollments();
+        var classFilterEl = document.getElementById('activityClassFilter');
+        var classFilter = classFilterEl ? classFilterEl.value : '';
+        var enrollments = this.getAllEnrollments();
         
-        // Filtrar por clase si es necesario
-        const filteredEnrollments = classFilter 
-            ? enrollments.filter(e => e.classId === classFilter)
+        var filteredEnrollments = classFilter 
+            ? enrollments.filter(function(e) { return e.classId === classFilter; })
             : enrollments;
         
-        // Tabla de actividad
-        const tbody = document.getElementById('activityTableBody');
+        var tbody = document.getElementById('activityTableBody');
         if (!tbody) return;
         
         tbody.innerHTML = '';
@@ -218,64 +219,58 @@ class TeacherPanel {
         if (filteredEnrollments.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay actividad registrada</td></tr>';
         } else {
-            filteredEnrollments.forEach(enr => {
-                const student = db.getUserById(enr.studentId);
-                const classItem = db.getClassById(enr.classId);
+            filteredEnrollments.forEach(function(enr) {
+                var student = db.getUserById(enr.studentId);
+                var classItem = db.getClassById(enr.classId);
                 
                 if (!student) return;
                 
-                // Contar accesos para este estudiante en esta clase
-                const activities = db.getActivitiesByUser(enr.studentId);
-                const classAccesses = activities.filter(a => 
-                    a.page.includes(enr.classId) || 
-                    a.page === `access_class_${enr.classId}`
-                ).length;
+                var activities = db.getActivitiesByUser(enr.studentId);
+                var classAccesses = activities.filter(function(a) {
+                    return a.page.indexOf(enr.classId) !== -1 || a.page === 'access_class_' + enr.classId;
+                }).length;
                 
-                const statusBadge = enr.completed 
+                var statusBadge = enr.completed 
                     ? '<span class="badge badge-success">✅ Completado</span>'
                     : enr.progress > 0 
                         ? '<span class="badge badge-warning">🔄 En Progreso</span>'
                         : '<span class="badge badge-info">📋 Inscrito</span>';
                 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${student.nombre}</strong></td>
-                    <td>${classItem ? classItem.title : 'N/A'}</td>
-                    <td>
-                        <div class="progress-bar" style="width: 100px; display: inline-block;">
-                            <div class="progress-fill" style="width: ${enr.progress}%"></div>
-                        </div>
-                        <span> ${enr.progress}%</span>
-                    </td>
-                    <td>${utils.formatRelativeTime(enr.lastAccess)}</td>
-                    <td>${classAccesses}</td>
-                    <td>${statusBadge}</td>
-                `;
+                var tr = document.createElement('tr');
+                tr.innerHTML = '' +
+                    '<td><strong>' + student.nombre + '</strong></td>' +
+                    '<td>' + (classItem ? classItem.title : 'N/A') + '</td>' +
+                    '<td>' +
+                        '<div class="progress-bar" style="width: 100px; display: inline-block;">' +
+                            '<div class="progress-fill" style="width: ' + enr.progress + '%"></div>' +
+                        '</div>' +
+                        '<span> ' + enr.progress + '%</span>' +
+                    '</td>' +
+                    '<td>' + utils.formatRelativeTime(enr.lastAccess) + '</td>' +
+                    '<td>' + classAccesses + '</td>' +
+                    '<td>' + statusBadge + '</td>';
                 tbody.appendChild(tr);
             });
         }
         
-        // Cargar gráficos
         this.loadActivityCharts(filteredEnrollments);
     }
 
     loadActivityCharts(enrollments) {
-        // Destruir gráficos anteriores
-        Object.values(this.charts).forEach(chart => chart.destroy());
+        for (var key in this.charts) {
+            if (this.charts[key]) this.charts[key].destroy();
+        }
         this.charts = {};
         
-        // Gráfico de accesos por día
         this.loadAccessChart();
-        
-        // Gráfico de distribución de progreso
         this.loadProgressDistributionChart(enrollments);
     }
 
     loadAccessChart() {
-        const ctx = document.getElementById('accessChart');
+        var ctx = document.getElementById('accessChart');
         if (!ctx) return;
         
-        const last7Days = this.getLast7DaysAccesses();
+        var last7Days = this.getLast7DaysAccesses();
         
         this.charts.access = new Chart(ctx, {
             type: 'bar',
@@ -306,11 +301,10 @@ class TeacherPanel {
     }
 
     loadProgressDistributionChart(enrollments) {
-        const ctx = document.getElementById('progressChart');
+        var ctx = document.getElementById('progressChart');
         if (!ctx) return;
         
-        // Agrupar por rangos de progreso
-        const ranges = {
+        var ranges = {
             '0%': 0,
             '1-25%': 0,
             '26-50%': 0,
@@ -319,8 +313,8 @@ class TeacherPanel {
             '100%': 0
         };
         
-        enrollments.forEach(enr => {
-            const p = enr.progress || 0;
+        enrollments.forEach(function(enr) {
+            var p = enr.progress || 0;
             if (p === 0) ranges['0%']++;
             else if (p <= 25) ranges['1-25%']++;
             else if (p <= 50) ranges['26-50%']++;
@@ -350,73 +344,88 @@ class TeacherPanel {
     }
 
     getLast7DaysAccesses() {
-        const myClasses = this.getMyClasses();
-        const myClassIds = myClasses.map(c => c.id);
-        const activities = db.getActivities();
+        var myClasses = this.getMyClasses();
+        var myClassIds = myClasses.map(function(c) { return c.id; });
+        var activities = db.getActivities();
         
-        const labels = [];
-        const data = [];
+        var labels = [];
+        var data = [];
         
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date();
+        for (var i = 6; i >= 0; i--) {
+            var date = new Date();
             date.setDate(date.getDate() - i);
-            const dateStr = date.toISOString().split('T')[0];
+            var dateStr = date.toISOString().split('T')[0];
             labels.push(date.toLocaleDateString('es-ES', { weekday: 'short' }));
             
-            const count = activities.filter(a => {
-                const aDate = new Date(a.timestamp).toISOString().split('T')[0];
-                return aDate === dateStr && 
-                    myClassIds.some(cId => a.page.includes(cId));
+            var count = activities.filter(function(a) {
+                var aDate = new Date(a.timestamp).toISOString().split('T')[0];
+                var found = false;
+                myClassIds.forEach(function(cId) {
+                    if (a.page.indexOf(cId) !== -1) found = true;
+                });
+                return aDate === dateStr && found;
             }).length;
             data.push(count);
         }
         
-        return { labels, data };
+        return { labels: labels, data: data };
     }
 
-    // ============================================
-    // SECCIÓN 3: REGISTRO DE ACCESOS
-    // ============================================
     loadAccessLog() {
-        const studentFilter = document.getElementById('accessStudentFilter')?.value;
-        const classFilter = document.getElementById('accessClassFilter')?.value;
+        var studentFilterEl = document.getElementById('accessStudentFilter');
+        var classFilterEl = document.getElementById('accessClassFilter');
+        var studentFilter = studentFilterEl ? studentFilterEl.value : '';
+        var classFilter = classFilterEl ? classFilterEl.value : '';
         
-        const myClasses = this.getMyClasses();
-        const myClassIds = myClasses.map(c => c.id);
-        let activities = db.getActivities()
-            .filter(a => myClassIds.some(cId => a.page.includes(cId)))
-            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        var myClasses = this.getMyClasses();
+        var myClassIds = myClasses.map(function(c) { return c.id; });
         
-        // Aplicar filtros
+        var activities = db.getActivities()
+            .filter(function(a) {
+                var found = false;
+                myClassIds.forEach(function(cId) {
+                    if (a.page.indexOf(cId) !== -1) found = true;
+                });
+                return found;
+            })
+            .sort(function(a, b) {
+                return new Date(b.timestamp) - new Date(a.timestamp);
+            });
+        
         if (studentFilter) {
-            activities = activities.filter(a => a.userId === studentFilter);
+            activities = activities.filter(function(a) { return a.userId === studentFilter; });
         }
         if (classFilter) {
-            activities = activities.filter(a => a.page.includes(classFilter));
+            activities = activities.filter(function(a) { return a.page.indexOf(classFilter) !== -1; });
         }
         
-        // Actualizar contadores
-        const today = new Date().toISOString().split('T')[0];
-        const todayCount = activities.filter(a => a.timestamp.startsWith(today)).length;
-        const activeStudents7Days = [...new Set(
-            activities.filter(a => {
-                const aDate = new Date(a.timestamp);
-                const sevenDaysAgo = new Date();
-                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-                return aDate >= sevenDaysAgo;
-            }).map(a => a.userId)
-        )].length;
+        var today = new Date().toISOString().split('T')[0];
+        var todayCount = activities.filter(function(a) {
+            return a.timestamp.indexOf(today) === 0;
+        }).length;
         
-        const totalSessionTime = activities.reduce((sum, a) => sum + (a.sessionTime || 0), 0);
-        const avgSessionTime = activities.length > 0 ? Math.round(totalSessionTime / activities.length) : 0;
+        var sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        var activeStudents7Days = [];
+        activities.forEach(function(a) {
+            var aDate = new Date(a.timestamp);
+            if (aDate >= sevenDaysAgo && activeStudents7Days.indexOf(a.userId) === -1) {
+                activeStudents7Days.push(a.userId);
+            }
+        });
+        
+        var totalSessionTime = activities.reduce(function(sum, a) {
+            return sum + (a.sessionTime || 0);
+        }, 0);
+        var avgSessionTime = activities.length > 0 ? Math.round(totalSessionTime / activities.length) : 0;
         
         document.getElementById('totalAccesses').textContent = activities.length;
         document.getElementById('todayAccesses').textContent = todayCount;
-        document.getElementById('activeStudentsCount').textContent = activeStudents7Days;
+        document.getElementById('activeStudentsCount').textContent = activeStudents7Days.length;
         document.getElementById('avgSessionTime').textContent = avgSessionTime + ' min';
         
-        // Tabla
-        const tbody = document.getElementById('accessTableBody');
+        var tbody = document.getElementById('accessTableBody');
         if (!tbody) return;
         
         tbody.innerHTML = '';
@@ -424,76 +433,75 @@ class TeacherPanel {
         if (activities.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay accesos registrados</td></tr>';
         } else {
-            activities.slice(0, 50).forEach(activity => {
-                const student = db.getUserById(activity.userId);
-                const classItem = myClasses.find(c => activity.page.includes(c.id));
+            activities.slice(0, 50).forEach(function(activity) {
+                var student = db.getUserById(activity.userId);
+                var classItem = null;
+                myClasses.forEach(function(c) {
+                    if (activity.page.indexOf(c.id) !== -1) classItem = c;
+                });
                 
-                let action = 'Acceso';
-                if (activity.page.includes('enrolled')) action = '📝 Inscripción';
-                else if (activity.page.includes('access')) action = '📚 Accedió a clase';
+                var action = 'Acceso';
+                if (activity.page.indexOf('enrolled') !== -1) action = '📝 Inscripción';
+                else if (activity.page.indexOf('access') !== -1) action = '📚 Accedió a clase';
                 else if (activity.page === 'login') action = '🔑 Inicio de sesión';
                 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${utils.formatDate(activity.timestamp)}</td>
-                    <td>${student ? student.nombre : 'Desconocido'}</td>
-                    <td>${classItem ? classItem.title : 'N/A'}</td>
-                    <td>${action}</td>
-                    <td>${activity.sessionTime || 0}s</td>
-                `;
+                var tr = document.createElement('tr');
+                tr.innerHTML = '' +
+                    '<td>' + utils.formatDate(activity.timestamp) + '</td>' +
+                    '<td>' + (student ? student.nombre : 'Desconocido') + '</td>' +
+                    '<td>' + (classItem ? classItem.title : 'N/A') + '</td>' +
+                    '<td>' + action + '</td>' +
+                    '<td>' + (activity.sessionTime || 0) + 's</td>';
                 tbody.appendChild(tr);
             });
         }
     }
 
-    // ============================================
-    // SECCIÓN 4: LISTA DE ESTUDIANTES
-    // ============================================
     loadStudentsList() {
-        const classFilter = document.getElementById('studentClassFilter')?.value;
-        const searchTerm = document.getElementById('studentSearch')?.value?.toLowerCase() || '';
+        var classFilterEl = document.getElementById('studentClassFilter');
+        var searchEl = document.getElementById('studentSearch');
+        var classFilter = classFilterEl ? classFilterEl.value : '';
+        var searchTerm = searchEl ? searchEl.value.toLowerCase() : '';
         
-        const myStudents = this.getMyStudents();
-        const enrollments = this.getAllEnrollments();
+        var myStudents = this.getMyStudents();
+        var enrollments = this.getAllEnrollments();
         
-        // Filtrar por clase
-        let filteredStudents = myStudents;
+        var filteredStudents = myStudents;
         if (classFilter) {
-            const classEnrollments = enrollments.filter(e => e.classId === classFilter);
-            const studentIds = classEnrollments.map(e => e.studentId);
-            filteredStudents = myStudents.filter(s => studentIds.includes(s.id));
+            var classEnrollments = enrollments.filter(function(e) { return e.classId === classFilter; });
+            var studentIds = classEnrollments.map(function(e) { return e.studentId; });
+            filteredStudents = myStudents.filter(function(s) {
+                return studentIds.indexOf(s.id) !== -1;
+            });
         }
         
-        // Filtrar por búsqueda
         if (searchTerm) {
-            filteredStudents = filteredStudents.filter(s => 
-                s.nombre.toLowerCase().includes(searchTerm) ||
-                s.email.toLowerCase().includes(searchTerm)
-            );
+            filteredStudents = filteredStudents.filter(function(s) {
+                return s.nombre.toLowerCase().indexOf(searchTerm) !== -1 ||
+                       s.email.toLowerCase().indexOf(searchTerm) !== -1;
+            });
         }
         
-        // Actualizar contadores
-        let totalProgress = 0;
-        let activeCount = 0;
-        let completedCount = 0;
+        var totalProgress = 0;
+        var activeCount = 0;
+        var completedCount = 0;
         
-        filteredStudents.forEach(student => {
-            const studentEnrollments = enrollments.filter(e => e.studentId === student.id);
-            const avg = utils.calculateAverageProgress(studentEnrollments);
+        filteredStudents.forEach(function(student) {
+            var studentEnrollments = enrollments.filter(function(e) { return e.studentId === student.id; });
+            var avg = utils.calculateAverageProgress(studentEnrollments);
             totalProgress += avg;
-            if (studentEnrollments.some(e => e.completed)) completedCount++;
-            if (studentEnrollments.some(e => e.progress > 0 && !e.completed)) activeCount++;
+            if (studentEnrollments.some(function(e) { return e.completed; })) completedCount++;
+            if (studentEnrollments.some(function(e) { return e.progress > 0 && !e.completed; })) activeCount++;
         });
         
-        const globalAvg = filteredStudents.length > 0 ? Math.round(totalProgress / filteredStudents.length) : 0;
+        var globalAvg = filteredStudents.length > 0 ? Math.round(totalProgress / filteredStudents.length) : 0;
         
         document.getElementById('totalEnrolledStudents').textContent = filteredStudents.length;
         document.getElementById('activeStudents').textContent = activeCount;
         document.getElementById('completedStudentsCount').textContent = completedCount;
         document.getElementById('globalAvgProgress').textContent = globalAvg + '%';
         
-        // Tabla
-        const tbody = document.getElementById('studentsTableBody');
+        var tbody = document.getElementById('studentsTableBody');
         if (!tbody) return;
         
         tbody.innerHTML = '';
@@ -501,58 +509,59 @@ class TeacherPanel {
         if (filteredStudents.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="text-center">No se encontraron estudiantes</td></tr>';
         } else {
-            filteredStudents.forEach(student => {
-                const studentEnrollments = enrollments.filter(e => e.studentId === student.id);
-                const avgProgress = utils.calculateAverageProgress(studentEnrollments);
-                const classesCount = studentEnrollments.length;
+            filteredStudents.forEach(function(student) {
+                var studentEnrollments = enrollments.filter(function(e) { return e.studentId === student.id; });
+                var avgProgress = utils.calculateAverageProgress(studentEnrollments);
+                var classesCount = studentEnrollments.length;
                 
-                const lastAccess = studentEnrollments
-                    .map(e => e.lastAccess)
-                    .sort((a, b) => new Date(b) - new Date(a))[0];
+                var lastAccess = null;
+                studentEnrollments.forEach(function(e) {
+                    if (!lastAccess || new Date(e.lastAccess) > new Date(lastAccess)) {
+                        lastAccess = e.lastAccess;
+                    }
+                });
                 
-                const hasCompleted = studentEnrollments.some(e => e.completed);
-                const hasActive = studentEnrollments.some(e => e.progress > 0 && !e.completed);
+                var hasCompleted = studentEnrollments.some(function(e) { return e.completed; });
+                var hasActive = studentEnrollments.some(function(e) { return e.progress > 0 && !e.completed; });
                 
-                const statusBadge = hasCompleted 
+                var statusBadge = hasCompleted 
                     ? '<span class="badge badge-success">✅ Completado</span>'
                     : hasActive 
                         ? '<span class="badge badge-warning">🔄 En Progreso</span>'
                         : '<span class="badge badge-info">📋 Sin actividad</span>';
                 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${student.nombre}</strong></td>
-                    <td>${student.email}</td>
-                    <td>${classesCount} clase(s)</td>
-                    <td>
-                        <div class="progress-bar" style="width: 80px; display: inline-block;">
-                            <div class="progress-fill" style="width: ${avgProgress}%"></div>
-                        </div>
-                        <span> ${avgProgress}%</span>
-                    </td>
-                    <td>${lastAccess ? utils.formatRelativeTime(lastAccess) : 'Nunca'}</td>
-                    <td>${statusBadge}</td>
-                    <td>
-                        <button class="action-btn view" onclick="teacherPanel.viewStudentDetail('${student.id}')">👁 Ver</button>
-                    </td>
-                `;
+                var tr = document.createElement('tr');
+                tr.innerHTML = '' +
+                    '<td><strong>' + student.nombre + '</strong></td>' +
+                    '<td>' + student.email + '</td>' +
+                    '<td>' + classesCount + ' clase(s)</td>' +
+                    '<td>' +
+                        '<div class="progress-bar" style="width: 80px; display: inline-block;">' +
+                            '<div class="progress-fill" style="width: ' + avgProgress + '%"></div>' +
+                        '</div>' +
+                        '<span> ' + avgProgress + '%</span>' +
+                    '</td>' +
+                    '<td>' + (lastAccess ? utils.formatRelativeTime(lastAccess) : 'Nunca') + '</td>' +
+                    '<td>' + statusBadge + '</td>' +
+                    '<td>' +
+                        '<button class="action-btn view" onclick="teacherPanel.viewStudentDetail(\'' + student.id + '\')">👁 Ver</button>' +
+                    '</td>';
                 tbody.appendChild(tr);
             });
         }
     }
 
     viewStudentDetail(studentId) {
-        const student = db.getUserById(studentId);
+        var student = db.getUserById(studentId);
         if (!student) return;
         
-        const enrollments = this.getAllEnrollments().filter(e => e.studentId === studentId);
+        var enrollments = this.getAllEnrollments().filter(function(e) { return e.studentId === studentId; });
         
-        // Mostrar en modal de progreso con información de este estudiante
-        let modalTitle = `Actividad de: ${student.nombre}`;
+        var modalTitle = 'Actividad de: ' + student.nombre;
         if (enrollments.length > 0) {
-            const classItem = db.getClassById(enrollments[0].classId);
+            var classItem = db.getClassById(enrollments[0].classId);
             document.getElementById('progressClassName').textContent = 
-                classItem ? `${modalTitle} - ${classItem.title}` : modalTitle;
+                classItem ? modalTitle + ' - ' + classItem.title : modalTitle;
         } else {
             document.getElementById('progressClassName').textContent = modalTitle;
         }
@@ -561,44 +570,41 @@ class TeacherPanel {
         document.getElementById('modalAvgProgress').textContent = 
             utils.calculateAverageProgress(enrollments) + '%';
         document.getElementById('modalCompleted').textContent = 
-            enrollments.filter(e => e.completed).length;
+            enrollments.filter(function(e) { return e.completed; }).length;
         
-        const tbody = document.getElementById('progressTableBody');
+        var tbody = document.getElementById('progressTableBody');
         tbody.innerHTML = '';
         
-        enrollments.forEach(enr => {
-            const classItem = db.getClassById(enr.classId);
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${classItem ? classItem.title : 'N/A'}</td>
-                <td>${student.email}</td>
-                <td>
-                    <div class="progress-bar" style="width: 120px; display: inline-block;">
-                        <div class="progress-fill" style="width: ${enr.progress}%"></div>
-                    </div>
-                    <span>${enr.progress}%</span>
-                </td>
-                <td>${utils.formatRelativeTime(enr.lastAccess)}</td>
-                <td><a href="${classItem?.link || '#'}?student=${studentId}" target="_blank" class="action-btn view">Acceder</a></td>
-            `;
+        enrollments.forEach(function(enr) {
+            var classItem = db.getClassById(enr.classId);
+            var tr = document.createElement('tr');
+            tr.innerHTML = '' +
+                '<td>' + (classItem ? classItem.title : 'N/A') + '</td>' +
+                '<td>' + student.email + '</td>' +
+                '<td>' +
+                    '<div class="progress-bar" style="width: 120px; display: inline-block;">' +
+                        '<div class="progress-fill" style="width: ' + enr.progress + '%"></div>' +
+                    '</div>' +
+                    '<span> ' + enr.progress + '%</span>' +
+                '</td>' +
+                '<td>' + utils.formatRelativeTime(enr.lastAccess) + '</td>' +
+                '<td><a href="' + (classItem ? classItem.link : '#') + '?student=' + studentId + '" target="_blank" class="action-btn view">Acceder</a></td>';
             tbody.appendChild(tr);
         });
         
         document.getElementById('progressModal').classList.add('active');
     }
 
-    // ============================================
-    // GESTIÓN DE CLASES (EXISTENTE)
-    // ============================================
-    openClassModal(classId = null) {
-        const modal = document.getElementById('classModal');
-        const form = document.getElementById('classForm');
+    openClassModal(classId) {
+        if (!classId) classId = null;
+        var modal = document.getElementById('classModal');
+        var form = document.getElementById('classForm');
         if (!modal || !form) return;
         
         form.reset();
         
         if (classId) {
-            const classItem = db.getClassById(classId);
+            var classItem = db.getClassById(classId);
             if (classItem) {
                 document.getElementById('classId').value = classItem.id;
                 document.getElementById('classTitle').value = classItem.title;
@@ -626,38 +632,39 @@ class TeacherPanel {
     }
 
     viewProgress(classId) {
-        const classItem = db.getClassById(classId);
+        var classItem = db.getClassById(classId);
         if (!classItem) return;
 
         document.getElementById('progressClassName').textContent = classItem.title;
-        const enrollments = db.getClassProgress(classId);
+        var enrollments = db.getClassProgress(classId);
         
         document.getElementById('modalTotalStudents').textContent = enrollments.length;
         document.getElementById('modalAvgProgress').textContent = 
             utils.calculateAverageProgress(enrollments) + '%';
         document.getElementById('modalCompleted').textContent = 
-            enrollments.filter(e => e.completed).length;
+            enrollments.filter(function(e) { return e.completed; }).length;
         
-        const tbody = document.getElementById('progressTableBody');
+        var tbody = document.getElementById('progressTableBody');
         tbody.innerHTML = '';
 
         if (enrollments.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay alumnos inscritos</td></tr>';
         } else {
-            enrollments.forEach(enrollment => {
-                const student = db.getUserById(enrollment.studentId);
+            enrollments.forEach(function(enrollment) {
+                var student = db.getUserById(enrollment.studentId);
                 if (student) {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${student.nombre}</td>
-                        <td>${student.email}</td>
-                        <td>
-                            <div class="progress-bar" style="width: 120px; display: inline-block;"><div class="progress-fill" style="width: ${enrollment.progress}%"></div></div>
-                            <span>${enrollment.progress}%</span>
-                        </td>
-                        <td>${utils.formatRelativeTime(enrollment.lastAccess)}</td>
-                        <td><a href="${classItem.link}?student=${student.id}" target="_blank" class="action-btn view">Acceder</a></td>
-                    `;
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = '' +
+                        '<td>' + student.nombre + '</td>' +
+                        '<td>' + student.email + '</td>' +
+                        '<td>' +
+                            '<div class="progress-bar" style="width: 120px; display: inline-block;">' +
+                                '<div class="progress-fill" style="width: ' + enrollment.progress + '%"></div>' +
+                            '</div>' +
+                            '<span> ' + enrollment.progress + '%</span>' +
+                        '</td>' +
+                        '<td>' + utils.formatRelativeTime(enrollment.lastAccess) + '</td>' +
+                        '<td><a href="' + classItem.link + '?student=' + student.id + '" target="_blank" class="action-btn view">Acceder</a></td>';
                     tbody.appendChild(tr);
                 }
             });
@@ -666,17 +673,19 @@ class TeacherPanel {
     }
 
     closeProgressModal() { 
-        document.getElementById('progressModal')?.classList.remove('active'); 
+        var modal = document.getElementById('progressModal');
+        if (modal) modal.classList.remove('active'); 
     }
     
     closeModal() { 
-        document.getElementById('classModal')?.classList.remove('active'); 
+        var modal = document.getElementById('classModal');
+        if (modal) modal.classList.remove('active'); 
     }
 
     saveClass() {
-        const classId = document.getElementById('classId').value;
-        const userId = this.session.id || this.session.userId;
-        const classData = {
+        var classId = document.getElementById('classId').value;
+        var userId = this.session.id || this.session.userId;
+        var classData = {
             title: document.getElementById('classTitle').value,
             description: document.getElementById('classDescription').value,
             link: document.getElementById('classLink').value,
@@ -702,15 +711,16 @@ class TeacherPanel {
     }
 
     setupEventListeners() {
-        const classForm = document.getElementById('classForm');
+        var self = this;
+        var classForm = document.getElementById('classForm');
         if (classForm) {
-            classForm.addEventListener('submit', (e) => {
+            classForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                this.saveClass();
+                self.saveClass();
             });
         }
 
-        window.addEventListener('click', (e) => {
+        window.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.remove('active');
             }
@@ -719,9 +729,9 @@ class TeacherPanel {
 }
 
 // Inicialización SEGURA
-if (window.location.pathname.includes('teacher.html') || 
-    window.location.pathname.includes('admin.html')) {
-    window.addEventListener('load', () => {
+if (window.location.pathname.indexOf('teacher.html') !== -1 || 
+    window.location.pathname.indexOf('admin.html') !== -1) {
+    window.addEventListener('load', function() {
         if (!window.teacherPanel) {
             window.teacherPanel = new TeacherPanel();
         }
