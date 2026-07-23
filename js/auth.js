@@ -1,118 +1,168 @@
-/**
- * js/auth.js
- * Lógica de autenticación, hashing y gestión de sesiones.
- */
-
-// Función de hash sincrónica robusta con salting (Evita errores async en file://)
-const hashPassword = (password) => {
-    const salt = "EduPlatform_Secure_Salt_2026_!";
-    let hash = 0;
-    const str = salt + password + salt;
-    
-    // Fase 1: Hash numérico tipo DJB2 modificado
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convertir a entero de 32 bits
+// Sistema de autenticación mejorado
+class AuthSystem {
+    constructor() {
+        this.currentUser = null;
+        this.init();
     }
     
-    // Fase 2: Amplificación y ofuscación a formato hexadecimal seguro
-    let amplified = Math.abs(hash).toString(16).padStart(8, '0');
-    for (let i = 0; i < 100; i++) {
-        amplified = btoa(amplified + str).replace(/[^a-zA-Z0-9]/g, '').substring(0, 64);
-    }
-    return amplified;
-};
-
-// Registra un nuevo usuario
-const registerUser = (nombre, email, password, rol = 'alumno') => {
-    try {
-        const users = JSON.parse(localStorage.getItem('edu_platform_users')) || [];
-        
-        // Validar si el email ya existe
-        const userExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
-        if (userExists) {
-            return { success: false, message: "El correo electrónico ya está registrado." };
+    init() {
+        // Verificar sesión existente
+        const savedUser = localStorage.getItem('userQOMED');
+        if (savedUser) {
+            this.currentUser = JSON.parse(savedUser);
         }
-
-        const newUser = {
-            id: 'usr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-            nombre,
-            email: email.toLowerCase(),
-            rol,
-            passwordHash: hashPassword(password),
-            fechaRegistro: new Date().toISOString(),
-            ultimoAcceso: new Date().toISOString()
-        };
-
-        users.push(newUser);
-        localStorage.setItem('edu_platform_users', JSON.stringify(users));
-        return { success: true, message: "Usuario registrado exitosamente." };
-    } catch (error) {
-        console.error("Error en registerUser:", error);
-        return { success: false, message: "Error interno al registrar el usuario." };
     }
-};
-
-// Inicia sesión y redirige según el rol
-const loginUser = (email, password) => {
-    try {
-        const users = JSON.parse(localStorage.getItem('edu_platform_users')) || [];
-        const user = users.find(u => u.email === email.toLowerCase());
-        const hashedPassword = hashPassword(password);
-
-        if (!user || user.passwordHash !== hashedPassword) {
-            return { success: false, message: "Credenciales incorrectas." };
+    
+    // Login de usuario
+    async login(email, password) {
+        try {
+            // Aquí iría tu lógica de autenticación
+            // Este es un ejemplo, reemplaza con tu API real
+            const response = await this.authenticateUser(email, password);
+            
+            if (response.success) {
+                const userData = {
+                    id: response.user.id,
+                    nombre: response.user.nombre,
+                    email: response.user.email,
+                    rol: response.user.rol, // 'administrador', 'profesor', 'estudiante'
+                    token: response.token
+                };
+                
+                // Guardar sesión
+                localStorage.setItem('userQOMED', JSON.stringify(userData));
+                this.currentUser = userData;
+                
+                // Redirigir según rol
+                this.redirectByRole(userData.rol);
+                
+                return { success: true, user: userData };
+            } else {
+                return { success: false, message: response.message || 'Error de autenticación' };
+            }
+        } catch (error) {
+            console.error('Error en login:', error);
+            return { success: false, message: 'Error al conectar con el servidor' };
         }
-
-        // Actualizar último acceso
-        user.ultimoAcceso = new Date().toISOString();
-        localStorage.setItem('edu_platform_users', JSON.stringify(users));
-
-        // Crear sesión (7 días de expiración)
-        const session = {
-            userId: user.id,
-            rol: user.rol,
-            loginTime: new Date().toISOString(),
-            expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 días en milisegundos
-        };
-        localStorage.setItem('edu_platform_session', JSON.stringify(session));
-
-        // Redirección según rol
-        const redirectMap = {
-            'admin': 'admin.html',
-            'profesor': 'teacher.html',
-            'alumno': 'student.html'
-        };
-        
-        window.location.href = redirectMap[user.rol] || 'index.html';
-        return { success: true, message: "Inicio de sesión exitoso." };
-    } catch (error) {
-        console.error("Error en loginUser:", error);
-        return { success: false, message: "Error interno al iniciar sesión." };
     }
-};
-
-// Cierra la sesión actual
-const logoutUser = () => {
-    localStorage.removeItem('edu_platform_session');
-    window.location.href = 'index.html';
-};
-
-// Obtiene la sesión actual si es válida
-const getCurrentSession = () => {
-    try {
-        const sessionStr = localStorage.getItem('edu_platform_session');
-        if (!sessionStr) return null;
-        
-        const session = JSON.parse(sessionStr);
-        if (Date.now() > session.expiresAt) {
-            localStorage.removeItem('edu_platform_session');
-            return null; // Sesión expirada
+    
+    // Registro de usuario
+    async register(userData) {
+        try {
+            // Aquí iría tu lógica de registro
+            // Este es un ejemplo, reemplaza con tu API real
+            const response = await this.registerUser(userData);
+            
+            if (response.success) {
+                return { 
+                    success: true, 
+                    message: 'Registro exitoso. Por favor, inicia sesión.' 
+                };
+            } else {
+                return { success: false, message: response.message || 'Error en el registro' };
+            }
+        } catch (error) {
+            console.error('Error en registro:', error);
+            return { success: false, message: 'Error al conectar con el servidor' };
         }
-        return session;
-    } catch (error) {
-        console.error("Error al leer la sesión:", error);
-        return null;
     }
-};
+    
+    // Redirigir según rol del usuario
+    redirectByRole(rol) {
+        const currentPage = window.location.pathname.split('/').pop();
+        
+        // Solo redirigir si no estamos ya en la página correcta
+        switch(rol) {
+            case 'administrador':
+                if (currentPage !== 'admin.html') {
+                    window.location.href = 'admin.html';
+                }
+                break;
+            case 'profesor':
+                if (currentPage !== 'teacher.html') {
+                    window.location.href = 'teacher.html';
+                }
+                break;
+            case 'estudiante':
+                if (currentPage !== 'student.html') {
+                    window.location.href = 'student.html';
+                }
+                break;
+            default:
+                // Rol no válido - limpiar todo y volver a index
+                console.error('Rol no válido:', rol);
+                this.logout('Error: Rol de usuario no válido');
+                break;
+        }
+    }
+    
+    // Cerrar sesión
+    logout(message = 'Has cerrado sesión exitosamente.') {
+        localStorage.removeItem('userQOMED');
+        this.currentUser = null;
+        
+        // Guardar mensaje de despedida
+        sessionStorage.setItem('authMessage', message);
+        
+        // Redirigir a index
+        if (window.location.pathname.split('/').pop() !== 'index.html') {
+            window.location.href = 'index.html';
+        } else {
+            // Si ya estamos en index, recargar para mostrar mensaje
+            window.location.reload();
+        }
+    }
+    
+    // Verificar si el usuario actual tiene un rol específico
+    hasRole(rol) {
+        return this.currentUser && this.currentUser.rol === rol;
+    }
+    
+    // Verificar si está autenticado
+    isAuthenticated() {
+        return this.currentUser !== null;
+    }
+    
+    // Obtener usuario actual
+    getCurrentUser() {
+        return this.currentUser;
+    }
+    
+    // Métodos para simular API (reemplazar con tu backend real)
+    async authenticateUser(email, password) {
+        // SIMULACIÓN - Reemplaza esto con tu llamada API real
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // Ejemplo de respuesta exitosa
+                resolve({
+                    success: true,
+                    user: {
+                        id: 1,
+                        nombre: 'Usuario Ejemplo',
+                        email: email,
+                        rol: 'estudiante' // Cambiar según necesidad
+                    },
+                    token: 'jwt-token-ejemplo'
+                });
+            }, 1000);
+        });
+    }
+    
+    async registerUser(userData) {
+        // SIMULACIÓN - Reemplaza esto con tu llamada API real
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                    success: true,
+                    message: 'Usuario registrado exitosamente'
+                });
+            }, 1000);
+        });
+    }
+}
+
+// Inicializar sistema de autenticación
+const auth = new AuthSystem();
+
+// Exportar para uso global
+window.auth = auth;
