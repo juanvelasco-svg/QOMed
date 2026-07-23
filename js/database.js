@@ -112,6 +112,12 @@ class Database {
     }
 
     // Clases
+    getCurrentUser() {
+        // Ejemplo de implementación:
+        const user = localStorage.getItem('currentUser');
+        return user ? JSON.parse(user) : null;
+    }
+
     getClasses() {
         return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CLASSES) || '[]');
     }
@@ -286,6 +292,7 @@ let db;
 window.addEventListener('load', () => {
     try {
         db = new Database();
+        window.db = db; // <--- AGREGA ESTA LÍNEA para hacerlo global
         console.log('Base de datos inicializada correctamente');
     } catch (error) {
         console.error('Error fatal al inicializar DB:', error);
