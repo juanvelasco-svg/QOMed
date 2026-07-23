@@ -7,6 +7,35 @@
     <link rel="stylesheet" href="css/themes.css">
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <!-- Estilos para anuncios del sistema de autenticación -->
+    <style>
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(0); opacity: 1; }
+            to { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+        }
+        
+        #auth-announcement {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.5s ease-out;
+        }
+    </style>
 </head>
 <body class="login-page">
     <div class="login-container">
@@ -71,15 +100,15 @@
     <script src="js/utils.js"></script>
     <script src="js/database.js"></script>
     <script src="js/auth.js"></script>
-    
-    <!-- Scripts de Paneles -->
+    <script src="js/jsauth-guard.js"></script>
     <script src="js/student-panel.js"></script>
     <script src="js/teacher-panel.js"></script>
     <script src="js/admin-panel.js"></script>
 
     <!-- Lógica de Login -->
+        <!-- Lógica de Login y Registro -->
     <script>
-        // Manejo de tabs
+        // ========== MANEJO DE TABS ==========
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
@@ -87,6 +116,7 @@
                 btn.classList.add('active');
                 document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
                 document.getElementById(tab + 'Form').classList.add('active');
+                // Limpiar mensajes
                 document.querySelectorAll('.error-message, .success-message').forEach(el => {
                     el.style.display = 'none';
                     el.textContent = '';
@@ -94,7 +124,43 @@
             });
         });
 
-        // Login
+        // ========== MOSTRAR ANUNCIO SI VIENE DE REDIRECCIÓN ==========
+        window.addEventListener('DOMContentLoaded', () => {
+            const message = sessionStorage.getItem('authMessage');
+            if (message) {
+                showAuthMessage(message);
+                sessionStorage.removeItem('authMessage');
+            }
+        });
+
+        // ========== FUNCIÓN PARA MOSTRAR ANUNCIO ==========
+        function showAuthMessage(message) {
+            const anuncio = document.createElement('div');
+            anuncio.id = 'auth-announcement';
+            anuncio.innerHTML = `
+                <span style="font-size: 20px;">🔐</span>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" style="
+                    background: none;
+                    border: none;
+                    color: white;
+                    cursor: pointer;
+                    font-size: 18px;
+                    margin-left: 10px;
+                ">✕</button>
+            `;
+            document.body.insertBefore(anuncio, document.body.firstChild);
+            
+            // Auto-eliminar después de 5 segundos
+            setTimeout(() => {
+                if (anuncio.parentElement) {
+                    anuncio.style.animation = 'slideUp 0.5s ease-in';
+                    setTimeout(() => anuncio.remove(), 500);
+                }
+            }, 5000);
+        }
+
+        // ========== LOGIN ==========
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -104,11 +170,16 @@
             
             if (!result.success) {
                 if(window.utils) utils.showError('loginError', result.message);
-                else alert(result.message);
+                else {
+                    const errorEl = document.getElementById('loginError');
+                    errorEl.textContent = result.message;
+                    errorEl.style.display = 'block';
+                }
             }
+            // Si es exitoso, loginUser ya redirige según el rol
         });
 
-        // Registro
+        // ========== REGISTRO ==========
         document.getElementById('registerForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.getElementById('regName').value;
@@ -120,48 +191,58 @@
             
             if (result.success) {
                 if(window.utils) utils.showSuccess('registerSuccess', result.message);
-                else alert(result.message);
+                else {
+                    const successEl = document.getElementById('registerSuccess');
+                    successEl.textContent = result.message;
+                    successEl.style.display = 'block';
+                }
                 
+                // Cambiar a tab de login después de registro exitoso
                 setTimeout(() => {
                     document.querySelector('[data-tab="login"]').click();
                     document.getElementById('loginEmail').value = email;
                 }, 1500);
             } else {
                 if(window.utils) utils.showError('registerError', result.message);
-                else alert(result.message);
+                else {
+                    const errorEl = document.getElementById('registerError');
+                    errorEl.textContent = result.message;
+                    errorEl.style.display = 'block';
+                }
             }
         });
 
-        // Redirección si hay sesión activa
+        // ========== REDIRECCIÓN SI HAY SESIÓN ACTIVA ==========
         window.addEventListener('DOMContentLoaded', () => {
-        // Evitar loop: Si ya estamos en student.html, teacher.html, etc., NO redirigir
-        const currentPath = window.location.pathname;
-        if (currentPath.includes('student.html') || 
-            currentPath.includes('teacher.html') || 
-            currentPath.includes('admin.html')) {
-            console.log("Ya estamos en un dashboard, omitiendo redirección.");
-            return;
-        }
+            const currentPath = window.location.pathname;
+            
+            // Si ya estamos en un dashboard, NO redirigir
+            if (currentPath.includes('student.html') || 
+                currentPath.includes('teacher.html') || 
+                currentPath.includes('admin.html')) {
+                console.log("Ya estamos en un dashboard, omitiendo redirección.");
+                return;
+            }
 
-        // Pequeño delay para asegurar que auth.js cargó
-        setTimeout(() => {
-            if (typeof getCurrentSession === 'function') {
-                const session = getCurrentSession();
-                if (session) {
-                    const redirectMap = {
-                        'admin': 'admin.html',
-                        'profesor': 'teacher.html',
-                        'alumno': 'student.html'
-                    };
-                    const target = redirectMap[session.rol];
-                    if (target) {
-                        console.log("Redirigiendo a:", target);
-                        window.location.href = target;
+            // Verificar sesión y redirigir según rol
+            setTimeout(() => {
+                if (typeof getCurrentSession === 'function') {
+                    const session = getCurrentSession();
+                    if (session) {
+                        const redirectMap = {
+                            'admin': 'admin.html',
+                            'profesor': 'teacher.html',
+                            'alumno': 'student.html'
+                        };
+                        const target = redirectMap[session.rol];
+                        if (target) {
+                            console.log("Redirigiendo a:", target);
+                            window.location.href = target;
+                        }
                     }
                 }
-            }
-        }, 200);
-    });
+            }, 300); // Aumenté el delay para asegurar carga completa
+        });
     </script>
 </body>
 </html>
