@@ -167,4 +167,14 @@ class StudentPanel {
     }
 }
 
-const studentPanel = new StudentPanel();
+window.addEventListener('load', () => {
+    // Pequeña verificación de seguridad
+    if (window.db) {
+        new StudentPanel();
+        console.log('StudentPanel iniciado correctamente con DB:', window.db);
+    } else {
+        console.error('Error fatal: window.db sigue sin existir tras el evento load.');
+        // Opcional: Recargar la página automáticamente si falla
+        // location.reload(); 
+    }
+});
