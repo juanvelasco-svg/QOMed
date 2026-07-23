@@ -23,14 +23,16 @@ class Database {
 
     createDefaultAdmin() {
         const users = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USERS)) || [];
-        const adminExists = users.some(u => u.rol === CONFIG.ROLES.ADMIN);
+        // Verificamos si CONFIG.ROLES.ADMIN existe, si no usamos 'admin'
+        const adminRole = CONFIG.ROLES ? CONFIG.ROLES.ADMIN : 'admin';
+        const adminExists = users.some(u => u.rol === adminRole);
         
         if (!adminExists) {
             const defaultAdmin = {
                 id: 'usr_admin_' + Date.now(),
                 nombre: 'Administrador',
                 email: 'admin@universidad.edu',
-                rol: CONFIG.ROLES.ADMIN,
+                rol: adminRole,
                 passwordHash: this.hashPassword('admin123'),
                 fechaRegistro: new Date().toISOString(),
                 ultimoAcceso: new Date().toISOString()
@@ -42,7 +44,6 @@ class Database {
     }
 
     hashPassword(password) {
-        // Usar la misma función de hash que auth.js
         const salt = "EduPlatform_Secure_Salt_2026_!";
         let hash = 0;
         const str = salt + password + salt;
@@ -113,18 +114,18 @@ class Database {
 
     // Clases
     getCurrentUser() {
-        // Ejemplo de implementación:
         const user = localStorage.getItem('currentUser');
         return user ? JSON.parse(user) : null;
     }
 
-   getClasses() {
-    // Devolvemos una promesa resuelta inmediatamente
-    return Promise.resolve(JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CLASSES) || '[]'));
+    // CORRECCIÓN: Método SÍNCRONO consistente con el resto de la clase
+    getClasses() {
+        return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CLASSES) || '[]');
     }
 
-    async getClassById(id) {
-        const classes = await this.getClasses();
+    // CORRECCIÓN: Método SÍNCRONO que usa el array devuelto por getClasses()
+    getClassById(id) {
+        const classes = this.getClasses();
         return classes.find(c => c.id === id);
     }
 
@@ -236,7 +237,6 @@ class Database {
         return '192.168.1.' + Math.floor(Math.random() * 255);
     }
 
-    // Limpieza de datos antiguos
     cleanOldData() {
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
@@ -244,12 +244,10 @@ class Database {
         let activities = this.getActivities();
         activities = activities.filter(a => new Date(a.timestamp) > sixMonthsAgo);
         localStorage.setItem(CONFIG.STORAGE_KEYS.ACTIVITY, JSON.stringify(activities));
-
         console.log('Datos antiguos limpiados');
         return true;
     }
 
-    // Exportar datos
     exportData() {
         const data = {
             users: this.getUsers(),
@@ -261,7 +259,6 @@ class Database {
         return data;
     }
 
-    // Estadísticas
     getStats() {
         const users = this.getUsers();
         const classes = this.getClasses();
@@ -279,23 +276,30 @@ class Database {
         return {
             totalUsers: users.length,
             activeUsers,
-            totalProfessors: users.filter(u => u.rol === CONFIG.ROLES.TEACHER).length,
-            totalStudents: users.filter(u => u.rol === CONFIG.ROLES.STUDENT).length,
-            totalAdmins: users.filter(u => u.rol === CONFIG.ROLES.ADMIN).length,
+            totalProfessors: users.filter(u => u.rol === (CONFIG.ROLES ? CONFIG.ROLES.TEACHER : 'profesor')).length,
+            totalStudents: users.filter(u => u.rol === (CONFIG.ROLES ? CONFIG.ROLES.STUDENT : 'alumno')).length,
+            totalAdmins: users.filter(u => u.rol === (CONFIG.ROLES ? CONFIG.ROLES.ADMIN : 'admin')).length,
             totalClasses: classes.length,
             totalEnrollments: enrollments.length
         };
     }
 }
 
+// Inicialización Global Correcta
 let db;
 
 window.addEventListener('load', () => {
     try {
+        // Verificar que CONFIG exista antes de iniciar
+        if (typeof CONFIG === 'undefined') {
+            throw new Error("CONFIG no está definido. ¿Se cargó config.js antes?");
+        }
+        
         db = new Database();
-        window.db = db; // <--- AGREGA ESTA LÍNEA para hacerlo global
-        console.log('Base de datos inicializada correctamente');
+        window.db = db; // Exponer globalmente
+        
+        console.log('✅ Base de datos inicializada correctamente');
     } catch (error) {
-        console.error('Error fatal al inicializar DB:', error);
+        console.error('❌ Error fatal al inicializar DB:', error);
     }
 });

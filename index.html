@@ -66,26 +66,27 @@
         </div>
     </div>
 
+     <!-- Scripts Core (Orden Crítico) -->
     <script src="js/config.js"></script>
-    <script src="js/database.js"></script>
-    <script src="js/student-panel.js"></script>
-    <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <!-- Scripts de Paneles -->
+    <script src="js/student-panel.js"></script>
+    <script src="js/teacher-panel.js"></script>
+    <script src="js/admin-panel.js"></script>
+
+    <!-- Lógica de Login -->
     <script>
         // Manejo de tabs
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
-                
-                // Actualizar tabs activas
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                
-                // Mostrar formulario correspondiente
                 document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
                 document.getElementById(tab + 'Form').classList.add('active');
-                
-                // Limpiar mensajes
                 document.querySelectorAll('.error-message, .success-message').forEach(el => {
                     el.style.display = 'none';
                     el.textContent = '';
@@ -102,9 +103,9 @@
             const result = loginUser(email, password);
             
             if (!result.success) {
-                utils.showError('loginError', result.message);
+                if(window.utils) utils.showError('loginError', result.message);
+                else alert(result.message);
             }
-            // Si es exitoso, la redirección se hace en loginUser
         });
 
         // Registro
@@ -118,27 +119,41 @@
             const result = registerUser(name, email, password, role);
             
             if (result.success) {
-                utils.showSuccess('registerSuccess', result.message);
+                if(window.utils) utils.showSuccess('registerSuccess', result.message);
+                else alert(result.message);
+                
                 setTimeout(() => {
                     document.querySelector('[data-tab="login"]').click();
                     document.getElementById('loginEmail').value = email;
                 }, 1500);
             } else {
-                utils.showError('registerError', result.message);
+                if(window.utils) utils.showError('registerError', result.message);
+                else alert(result.message);
             }
         });
 
-        // Verificar si ya hay sesión activa
+        // Redirección si hay sesión activa
         window.addEventListener('DOMContentLoaded', () => {
-            const session = getCurrentSession();
-            if (session) {
-                const redirectMap = {
-                    'admin': 'admin.html',
-                    'profesor': 'teacher.html',
-                    'alumno': 'student.html'
-                };
-                window.location.href = redirectMap[session.rol] || 'index.html';
-            }
+            // Pequeño delay para asegurar que auth.js cargó
+            setTimeout(() => {
+                if (typeof getCurrentSession === 'function') {
+                    const session = getCurrentSession();
+                    if (session) {
+                        const redirectMap = {
+                            'admin': 'admin.html',
+                            'profesor': 'teacher.html', // o dashboard-profesor.html según tu estructura
+                            'alumno': 'student.html'   // o dashboard-estudiante.html
+                        };
+                        // Evitar bucle si ya estamos en la página correcta
+                        const currentPath = window.location.pathname.split('/').pop();
+                        const target = redirectMap[session.rol];
+                        
+                        if (target && currentPath !== target) {
+                            window.location.href = target;
+                        }
+                    }
+                }
+            }, 100);
         });
     </script>
 </body>
