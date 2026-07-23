@@ -1,54 +1,62 @@
 class StudentPanel {
     constructor() {
-        // 1. Validar sesión PRIMERO
         this.session = getCurrentSession();
-        if (!this.session) {
-            console.warn("No hay sesión, redirigiendo a login...");
-            window.location.href = 'index.html';
+        if (!this.session || this.session.rol !== 'alumno') {
+            console.warn("Acceso denegado: no es alumno");
+            if (this.session) {
+                // Si tiene sesión pero no es alumno, redirigir a su panel
+                const redirectMap = {
+                    'admin': 'admin.html',
+                    'profesor': 'teacher.html'
+                };
+                window.location.href = redirectMap[this.session.rol] || 'index.html';
+            } else {
+                window.location.href = 'index.html';
+            }
             return;
         }
 
-        // 2. Validar DB DESPUÉS
-        this.db = window.db;
-        if (!this.db) {
-            console.error("⚠️ DB no lista aún. Reintentando en 500ms...");
-            // En lugar de fallar, reintentamos una sola vez
+        this.currentView = 'all';
+        this.initWhenReady();
+    }
+
+    initWhenReady() {
+        if (window.db) {
+            this.db = window.db;
+            this.init();
+        } else {
             setTimeout(() => {
-                this.db = window.db;
-                if (this.db) {
+                if (window.db) {
+                    this.db = window.db;
                     this.init();
                 } else {
-                    console.error("❌ Error crítico: DB no cargó tras reintento.");
-                    alert("Error de carga. Recarga la página.");
+                    console.error("DB no disponible");
                 }
             }, 500);
-            return; // Salimos del constructor aquí, init() se llamará luego
         }
-
-        this.currentView = 'all';
-        this.init();
     }
 
     init() {
-        console.log("Inicializando panel para:", this.session.userId);
         this.loadClasses();
         this.loadActivity();
         this.setupEventListeners();
-        this.db.logActivity(this.session.userId, 'student_panel', 0);
+        if (this.db) {
+            this.db.logActivity(this.session.id || this.session.userId, 'student_panel', 0);
+        }
     }
 
     loadClasses() {
-        // LLAMADA SÍNCRONA: getClasses() devuelve un array directamente
+        if (!this.db) return;
+        
         const allClasses = this.db.getClasses();
-        const enrollments = this.db.getStudentProgress(this.session.userId);
+        const userId = this.session.id || this.session.userId;
+        const enrollments = this.db.getStudentProgress(userId);
 
-        // Crear mapa de inscripciones para acceso rápido
         const enrollmentMap = {};
         enrollments.forEach(e => { 
             enrollmentMap[e.classId] = e; 
         });
 
-        // Mezclar clases con progreso
         const classesWithProgress = allClasses.map(classItem => ({
             ...classItem,
             progress: enrollmentMap[classItem.id] ? enrollmentMap[classItem.id].progress : 0,
@@ -56,16 +64,11 @@ class StudentPanel {
             completed: enrollmentMap[classItem.id] ? enrollmentMap[classItem.id].completed : false
         }));
 
-        // Filtrar y ordenar
         const filteredClasses = this.filterClasses(classesWithProgress);
         const sortedClasses = this.sortClasses(filteredClasses);
 
-        // Renderizar
         const grid = document.getElementById('studentClassesGrid');
-        if (!grid) {
-            console.warn("No se encontró el contenedor 'studentClassesGrid'");
-            return;
-        }
+        if (!grid) return;
 
         grid.innerHTML = '';
 
@@ -84,7 +87,7 @@ class StudentPanel {
             case 'pending': return classes.filter(c => !c.enrolled);
             case 'progress': return classes.filter(c => c.enrolled && !c.completed && c.progress > 0);
             case 'completed': return classes.filter(c => c.completed);
-            default: return classes; // 'all'
+            default: return classes;
         }
     }
 
@@ -101,7 +104,6 @@ class StudentPanel {
     createClassCard(classItem) {
         const div = document.createElement('div');
         div.className = 'class-card';
-        // Usar color por defecto si no existe
         const color = classItem.color || '#4F46E5'; 
         div.style.borderTopColor = color;
 
@@ -115,6 +117,7 @@ class StudentPanel {
         }
 
         const description = classItem.description ? utils.truncate(classItem.description, 100) : 'Sin descripción';
+        const userId = this.session.id || this.session.userId;
 
         div.innerHTML = `
             <div class="class-card-header" style="background: linear-gradient(135deg, ${color}22 0%, transparent 100%);">
@@ -131,7 +134,7 @@ class StudentPanel {
                 ` : ''}
                 <div class="class-actions" style="margin-top: 15px;">
                     ${classItem.enrolled ? `
-                        <a href="${classItem.link}?student=${this.session.userId}" target="_blank" class="btn btn-primary" style="text-decoration: none;">📚 Acceder</a>
+                        <a href="${classItem.link}?student=${userId}" target="_blank" class="btn btn-primary" style="text-decoration: none;">📚 Acceder</a>
                     ` : `
                         <button class="btn btn-primary" onclick="window.studentPanel.enroll('${classItem.id}')">📝 Inscribirse</button>
                     `}
@@ -144,8 +147,9 @@ class StudentPanel {
     enroll(classId) {
         if(!confirm("¿Deseas inscribirte en esta clase?")) return;
         
-        this.db.enrollStudent(this.session.userId, classId);
-        this.db.logActivity(this.session.userId, `enrolled_class_${classId}`, 0);
+        const userId = this.session.id || this.session.userId;
+        this.db.enrollStudent(userId, classId);
+        this.db.logActivity(userId, `enrolled_class_${classId}`, 0);
         
         if(window.utils) {
             window.utils.showToast('Inscripción exitosa', 'success');
@@ -156,17 +160,11 @@ class StudentPanel {
         this.loadClasses();
     }
 
-    logAccess(classId) {
-        const enrollments = this.db.getEnrollments();
-        const enrollment = enrollments.find(e => e.studentId === this.session.userId && e.classId === classId);
-        if (enrollment) {
-            this.db.updateProgress(this.session.userId, classId, enrollment.progress);
-        }
-        this.db.logActivity(this.session.userId, `access_class_${classId}`, 0);
-    }
-
     loadActivity() {
-        const activities = this.db.getActivitiesByUser(this.session.userId).slice(-10).reverse();
+        if (!this.db) return;
+        
+        const userId = this.session.id || this.session.userId;
+        const activities = this.db.getActivitiesByUser(userId).slice(-10).reverse();
         const container = document.getElementById('activityList');
         
         if (!container) return;
@@ -214,7 +212,6 @@ class StudentPanel {
     setupEventListeners() {
         const buttons = document.querySelectorAll('.view-toggle .btn');
         buttons.forEach(btn => {
-            // Clonar nodo para eliminar listeners previos o usar flag
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
             
@@ -228,22 +225,17 @@ class StudentPanel {
     }
 }
 
-// Inicialización robusta
-let panelInitAttempted = false;
-
-window.addEventListener('load', () => {
-    if (panelInitAttempted) return; // Evitar doble ejecución
-    panelInitAttempted = true;
-
-    if (window.db) {
-        window.studentPanel = new StudentPanel();
-    } else {
-        console.warn("Esperando a DB en evento load...");
-        // Último reintento
-        setTimeout(() => {
-            if(window.db && !window.studentPanel) {
-                window.studentPanel = new StudentPanel();
-            }
-        }, 1000);
-    }
-});
+// Inicialización SEGURA - Solo si estamos en student.html
+if (window.location.pathname.includes('student.html')) {
+    window.addEventListener('load', () => {
+        if (window.db && !window.studentPanel) {
+            window.studentPanel = new StudentPanel();
+        } else if (!window.db) {
+            setTimeout(() => {
+                if (window.db && !window.studentPanel) {
+                    window.studentPanel = new StudentPanel();
+                }
+            }, 1000);
+        }
+    });
+}
