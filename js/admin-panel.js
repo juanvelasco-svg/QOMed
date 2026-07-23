@@ -2,7 +2,16 @@ class AdminPanel {
     constructor() {
         this.session = getCurrentSession();
         if (!this.session || this.session.rol !== 'admin') {
-            window.location.href = 'index.html';
+            console.warn("Acceso denegado: no es admin");
+            if (this.session) {
+                const redirectMap = {
+                    'profesor': 'teacher.html',
+                    'alumno': 'student.html'
+                };
+                window.location.href = redirectMap[this.session.rol] || 'index.html';
+            } else {
+                window.location.href = 'index.html';
+            }
             return;
         }
         this.init();
@@ -40,10 +49,16 @@ class AdminPanel {
 
     loadDashboard() {
         const stats = db.getStats();
-        document.getElementById('totalUsers').textContent = stats.totalUsers;
-        document.getElementById('activeUsers').textContent = stats.activeUsers;
-        document.getElementById('totalProfessors').textContent = stats.totalProfessors;
-        document.getElementById('totalStudents').textContent = stats.totalStudents;
+        const totalUsersEl = document.getElementById('totalUsers');
+        const activeUsersEl = document.getElementById('activeUsers');
+        const totalProfessorsEl = document.getElementById('totalProfessors');
+        const totalStudentsEl = document.getElementById('totalStudents');
+        
+        if (totalUsersEl) totalUsersEl.textContent = stats.totalUsers;
+        if (activeUsersEl) activeUsersEl.textContent = stats.activeUsers;
+        if (totalProfessorsEl) totalProfessorsEl.textContent = stats.totalProfessors;
+        if (totalStudentsEl) totalStudentsEl.textContent = stats.totalStudents;
+        
         this.loadCharts(stats);
     }
 
@@ -109,6 +124,8 @@ class AdminPanel {
         const users = db.getUsers().filter(u => u.rol === role);
         const tbodyId = role === 'profesor' ? 'professorsTableBody' : 'studentsTableBody';
         const tbody = document.getElementById(tbodyId);
+        if (!tbody) return;
+        
         tbody.innerHTML = '';
 
         users.forEach(user => {
@@ -143,17 +160,22 @@ class AdminPanel {
         const tbody = document.getElementById('activityTableBody');
         const userFilter = document.getElementById('activityUserFilter');
         
+        if (!tbody) return;
+        
         tbody.innerHTML = '';
-        userFilter.innerHTML = '<option value="">Todos los usuarios</option>';
+        
+        if (userFilter) {
+            userFilter.innerHTML = '<option value="">Todos los usuarios</option>';
+            const users = db.getUsers();
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.nombre} (${user.rol})`;
+                userFilter.appendChild(option);
+            });
+        }
 
         const users = db.getUsers();
-        users.forEach(user => {
-            const option = document.createElement('option');
-            option.value = user.id;
-            option.textContent = `${user.nombre} (${user.rol})`;
-            userFilter.appendChild(option);
-        });
-
         activities.forEach(activity => {
             const user = users.find(u => u.id === activity.userId);
             const tr = document.createElement('tr');
@@ -169,9 +191,9 @@ class AdminPanel {
     }
 
     filterActivity() {
-        const dateFrom = document.getElementById('activityDateFrom').value;
-        const dateTo = document.getElementById('activityDateTo').value;
-        const userId = document.getElementById('activityUserFilter').value;
+        const dateFrom = document.getElementById('activityDateFrom')?.value;
+        const dateTo = document.getElementById('activityDateTo')?.value;
+        const userId = document.getElementById('activityUserFilter')?.value;
 
         let activities = db.getActivities();
         if (dateFrom) activities = activities.filter(a => new Date(a.timestamp) >= new Date(dateFrom));
@@ -179,6 +201,8 @@ class AdminPanel {
         if (userId) activities = activities.filter(a => a.userId === userId);
 
         const tbody = document.getElementById('activityTableBody');
+        if (!tbody) return;
+        
         tbody.innerHTML = '';
         const users = db.getUsers();
 
@@ -199,6 +223,8 @@ class AdminPanel {
     openUserModal(role = 'alumno') {
         const modal = document.getElementById('userModal');
         const form = document.getElementById('userForm');
+        if (!modal || !form) return;
+        
         form.reset();
         document.getElementById('userId').value = '';
         document.getElementById('modalRole').value = role;
@@ -223,14 +249,14 @@ class AdminPanel {
         if (!utils.confirm('¿Estás seguro de eliminar este usuario?')) return;
         db.deleteUser(userId);
         utils.showToast('Usuario eliminado', 'success');
-        // Recargar vista actual
-        const activeSection = document.querySelector('.content-section.active').id.replace('Section', '');
+        const activeSection = document.querySelector('.content-section.active')?.id.replace('Section', '');
         if (activeSection === 'professors') this.loadUsers('profesor');
         if (activeSection === 'students') this.loadUsers('alumno');
     }
 
     closeModal() {
-        document.getElementById('userModal').classList.remove('active');
+        const modal = document.getElementById('userModal');
+        if (modal) modal.classList.remove('active');
     }
 
     saveUser() {
@@ -260,7 +286,7 @@ class AdminPanel {
                 utils.showToast('Usuario creado', 'success');
             }
             this.closeModal();
-            const activeSection = document.querySelector('.content-section.active').id.replace('Section', '');
+            const activeSection = document.querySelector('.content-section.active')?.id.replace('Section', '');
             if (activeSection === 'professors') this.loadUsers('profesor');
             if (activeSection === 'students') this.loadUsers('alumno');
         } catch (error) {
@@ -288,10 +314,13 @@ class AdminPanel {
     }
 
     setupEventListeners() {
-        document.getElementById('userForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.saveUser();
-        });
+        const userForm = document.getElementById('userForm');
+        if (userForm) {
+            userForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.saveUser();
+            });
+        }
 
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
@@ -301,5 +330,11 @@ class AdminPanel {
     }
 }
 
-// Inicializar panel
-const adminPanel = new AdminPanel();
+// Inicialización SEGURA - Solo si estamos en admin.html
+if (window.location.pathname.includes('admin.html')) {
+    window.addEventListener('load', () => {
+        if (!window.adminPanel) {
+            window.adminPanel = new AdminPanel();
+        }
+    });
+}
