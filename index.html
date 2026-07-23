@@ -134,27 +134,34 @@
 
         // Redirección si hay sesión activa
         window.addEventListener('DOMContentLoaded', () => {
-            // Pequeño delay para asegurar que auth.js cargó
-            setTimeout(() => {
-                if (typeof getCurrentSession === 'function') {
-                    const session = getCurrentSession();
-                    if (session) {
-                        const redirectMap = {
-                            'admin': 'admin.html',
-                            'profesor': 'teacher.html', // o dashboard-profesor.html según tu estructura
-                            'alumno': 'student.html'   // o dashboard-estudiante.html
-                        };
-                        // Evitar bucle si ya estamos en la página correcta
-                        const currentPath = window.location.pathname.split('/').pop();
-                        const target = redirectMap[session.rol];
-                        
-                        if (target && currentPath !== target) {
-                            window.location.href = target;
-                        }
+        // Evitar loop: Si ya estamos en student.html, teacher.html, etc., NO redirigir
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('student.html') || 
+            currentPath.includes('teacher.html') || 
+            currentPath.includes('admin.html')) {
+            console.log("Ya estamos en un dashboard, omitiendo redirección.");
+            return;
+        }
+
+        // Pequeño delay para asegurar que auth.js cargó
+        setTimeout(() => {
+            if (typeof getCurrentSession === 'function') {
+                const session = getCurrentSession();
+                if (session) {
+                    const redirectMap = {
+                        'admin': 'admin.html',
+                        'profesor': 'teacher.html',
+                        'alumno': 'student.html'
+                    };
+                    const target = redirectMap[session.rol];
+                    if (target) {
+                        console.log("Redirigiendo a:", target);
+                        window.location.href = target;
                     }
                 }
-            }, 100);
-        });
+            }
+        }, 200);
+    });
     </script>
 </body>
 </html>

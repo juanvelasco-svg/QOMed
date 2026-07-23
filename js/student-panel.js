@@ -1,19 +1,28 @@
 class StudentPanel {
     constructor() {
-        // 1. Capturar la instancia global de la base de datos
-        this.db = window.db;
-
-        // 2. Validar críticamente que db exista
-        if (!this.db) {
-            console.error("🚫 Error crítico: La base de datos (db) no se ha inicializado aún.");
-            alert("Error de carga: La base de datos no está lista. Recarga la página.");
-            return; 
-        }
-
+        // 1. Validar sesión PRIMERO
         this.session = getCurrentSession();
         if (!this.session) {
+            console.warn("No hay sesión, redirigiendo a login...");
             window.location.href = 'index.html';
             return;
+        }
+
+        // 2. Validar DB DESPUÉS
+        this.db = window.db;
+        if (!this.db) {
+            console.error("⚠️ DB no lista aún. Reintentando en 500ms...");
+            // En lugar de fallar, reintentamos una sola vez
+            setTimeout(() => {
+                this.db = window.db;
+                if (this.db) {
+                    this.init();
+                } else {
+                    console.error("❌ Error crítico: DB no cargó tras reintento.");
+                    alert("Error de carga. Recarga la página.");
+                }
+            }, 500);
+            return; // Salimos del constructor aquí, init() se llamará luego
         }
 
         this.currentView = 'all';
@@ -21,14 +30,11 @@ class StudentPanel {
     }
 
     init() {
-        // Cargar datos iniciales
+        console.log("Inicializando panel para:", this.session.userId);
         this.loadClasses();
         this.loadActivity();
         this.setupEventListeners();
-        
-        // Log de acceso
         this.db.logActivity(this.session.userId, 'student_panel', 0);
-        console.log('✅ StudentPanel iniciado para:', this.session.userId);
     }
 
     loadClasses() {
@@ -208,22 +214,36 @@ class StudentPanel {
     setupEventListeners() {
         const buttons = document.querySelectorAll('.view-toggle .btn');
         buttons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                buttons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.currentView = btn.dataset.view;
+            // Clonar nodo para eliminar listeners previos o usar flag
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', () => {
+                document.querySelectorAll('.view-toggle .btn').forEach(b => b.classList.remove('active'));
+                newBtn.classList.add('active');
+                this.currentView = newBtn.dataset.view;
                 this.loadClasses();
             });
         });
     }
 }
 
-// Inicialización segura al cargar la ventana
+// Inicialización robusta
+let panelInitAttempted = false;
+
 window.addEventListener('load', () => {
+    if (panelInitAttempted) return; // Evitar doble ejecución
+    panelInitAttempted = true;
+
     if (window.db) {
         window.studentPanel = new StudentPanel();
-        console.log('✅ StudentPanel instanciado correctamente');
     } else {
-        console.error('❌ Error fatal: window.db no existe tras el evento load.');
+        console.warn("Esperando a DB en evento load...");
+        // Último reintento
+        setTimeout(() => {
+            if(window.db && !window.studentPanel) {
+                window.studentPanel = new StudentPanel();
+            }
+        }, 1000);
     }
 });
