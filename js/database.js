@@ -123,8 +123,8 @@ class Database {
     return Promise.resolve(JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CLASSES) || '[]'));
     }
 
-    getClassById(id) {
-        const classes = this.getClasses();
+    async getClassById(id) {
+        const classes = await this.getClasses();
         return classes.find(c => c.id === id);
     }
 
