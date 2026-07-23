@@ -1,13 +1,23 @@
 class StudentPanel {
     constructor() {
-        this.session = getCurrentSession();
-        if (!this.session) {
-            window.location.href = 'index.html';
-            return;
-        }
-        this.currentView = 'all';
-        this.init();
+    // 1. Capturar la instancia global de la base de datos
+    this.db = window.db;
+
+    // 2. Validar que db exista antes de continuar
+    if (!this.db) {
+        console.error("Error crítico: La base de datos (db) no se ha inicializado aún.");
+        // Opcional: podrías lanzar un error o intentar reintentar más tarde
+        return; 
     }
+
+    this.session = getCurrentSession();
+    if (!this.session) {
+        window.location.href = 'index.html';
+        return;
+    }
+    this.currentView = 'all';
+    this.init();
+}
 
     init() {
         this.loadClasses();
