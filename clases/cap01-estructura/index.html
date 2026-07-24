@@ -1212,48 +1212,8 @@
                 Nivel 2: 4 electrones (2s² 2p²)
             </div>
 
-            <div class="diagram-container">
-                <h3 class="mb-2">Diagrama de Orbitales Atómicos del Carbono</h3>
-                <svg class="orbital-svg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="gradientS" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
-                        </linearGradient>
-                        <linearGradient id="gradientP" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    
-                    <!-- 1s Orbital -->
-                    <g transform="translate(100, 200)">
-                        <circle cx="0" cy="0" r="40" class="orbital-s"/>
-                        <text x="0" y="-55" class="atom-label" text-anchor="middle">1s²</text>
-                        <text x="0" y="70" class="atom-label" text-anchor="middle" font-size="12">Nivel 1</text>
-                    </g>
-                    
-                    <!-- 2s Orbital -->
-                    <g transform="translate(400, 150)">
-                        <circle cx="0" cy="0" r="50" class="orbital-s"/>
-                        <text x="0" y="-65" class="atom-label" text-anchor="middle">2s²</text>
-                    </g>
-                    
-                    <!-- 2p Orbitals -->
-                    <g transform="translate(400, 280)">
-                        <!-- px -->
-                        <ellipse cx="-60" cy="0" rx="25" ry="40" class="orbital-p" transform="rotate(0)"/>
-                        <ellipse cx="60" cy="0" rx="25" ry="40" class="orbital-p" transform="rotate(0)"/>
-                        <text x="0" y="60" class="atom-label" text-anchor="middle">2p²</text>
-                        <text x="-60" y="-50" class="atom-label" text-anchor="middle" font-size="10">px</text>
-                        <text x="60" y="-50" class="atom-label" text-anchor="middle" font-size="10">py</text>
-                    </g>
-                    
-                    <!-- Energy levels -->
-                    <line x1="50" y1="200" x2="750" y2="200" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="5,5"/>
-                    <text x="750" y="150" class="atom-label" text-anchor="end">Mayor Energía ↑</text>
-                    <text x="750" y="350" class="atom-label" text-anchor="end">Menor Energía</text>
-                </svg>
+            <div class="formula-image">
+                <img src="images/orbital-diagram-carbon.png" alt="Diagrama de Orbitales Atómicos del Carbono" style="max-width: 100%; height: auto; border-radius: 12px;">
                 <p class="formula-caption">Figura 1.1: Distribución de electrones en los orbitales atómicos del carbono en su estado fundamental</p>
             </div>
 
@@ -1397,67 +1357,10 @@
             </div>
 
             <div class="formula-image">
-                <svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                            <polygon points="0 0, 10 3, 0 6" fill="#2563eb"/>
-                        </marker>
-                    </defs>
-                    
-                    <!-- Estado Fundamental -->
-                    <g transform="translate(50, 50)">
-                        <rect x="0" y="0" width="200" height="200" rx="10" fill="rgba(59, 130, 246, 0.1)" stroke="#3b82f6" stroke-width="2"/>
-                        <text x="100" y="30" class="atom-label" text-anchor="middle" font-weight="bold">ESTADO FUNDAMENTAL</text>
-                        
-                        <!-- Orbitales -->
-                        <g transform="translate(20, 60)">
-                            <rect x="0" y="0" width="40" height="60" fill="rgba(59, 130, 246, 0.3)" stroke="#3b82f6"/>
-                            <text x="20" y="85" class="atom-label" text-anchor="middle" font-size="12">2s²</text>
-                            <circle cx="15" cy="20" r="5" fill="#3b82f6"/>
-                            <circle cx="25" cy="40" r="5" fill="#3b82f6"/>
-                        </g>
-                        
-                        <g transform="translate(90, 60)">
-                            <rect x="0" y="0" width="40" height="60" fill="rgba(16, 185, 129, 0.3)" stroke="#10b981"/>
-                            <circle cx="15" cy="20" r="5" fill="#10b981"/>
-                            <text x="20" y="85" class="atom-label" text-anchor="middle" font-size="12">2p</text>
-                        </g>
-                        <g transform="translate(140, 60)">
-                            <rect x="0" y="0" width="40" height="60" fill="rgba(16, 185, 129, 0.3)" stroke="#10b981"/>
-                            <circle cx="20" cy="20" r="5" fill="#10b981"/>
-                        </g>
-                    </g>
-                    
-                    <!-- Flecha de excitación -->
-                    <line x1="280" y1="150" x2="320" y2="150" stroke="#2563eb" stroke-width="3" marker-end="url(#arrowhead)"/>
-                    <text x="300" y="140" class="atom-label" text-anchor="middle" font-size="12">Energía</text>
-                    
-                    <!-- Estado Excitado -->
-                    <g transform="translate(350, 50)">
-                        <rect x="0" y="0" width="200" height="200" rx="10" fill="rgba(245, 158, 11, 0.1)" stroke="#f59e0b" stroke-width="2"/>
-                        <text x="100" y="30" class="atom-label" text-anchor="middle" font-weight="bold">ESTADO EXCITADO</text>
-                        
-                        <!-- Orbitales -->
-                        <g transform="translate(20, 60)">
-                            <rect x="0" y="0" width="40" height="60" fill="rgba(245, 158, 11, 0.3)" stroke="#f59e0b"/>
-                            <text x="20" y="85" class="atom-label" text-anchor="middle" font-size="12">2s¹</text>
-                            <circle cx="20" cy="20" r="5" fill="#f59e0b"/>
-                        </g>
-                        
-                        <g transform="translate(90, 60)">
-                            <rect x="0" y="0" width="40" height="60" fill="rgba(245, 158, 11, 0.3)" stroke="#f59e0b"/>
-                            <circle cx="20" cy="20" r="5" fill="#f59e0b"/>
-                            <text x="20" y="85" class="atom-label" text-anchor="middle" font-size="12">2p</text>
-                        </g>
-                        <g transform="translate(140, 60)">
-                            <rect x="0" y="0" width="40" height="60" fill="rgba(245, 158, 11, 0.3)" stroke="#f59e0b"/>
-                            <circle cx="20" cy="20" r="5" fill="#f59e0b"/>
-                        </g>
-                    </g>
-                </svg>
+                <img src="images/excitation-process.png" alt="Proceso de Excitación del Carbono" style="max-width: 100%; height: auto; border-radius: 12px;">
                 <p class="formula-caption">Figura 1.2: Proceso de excitación del carbono. Un electrón del orbital 2s salta a un orbital 2p vacío</p>
             </div>
-
+            
             <div class="formula-box">
                 <strong>Proceso de Excitación:</strong><br>
                 <span style="color: #3b82f6;">C (fundamental):</span> 1s² 2s² 2p² → <span style="color: #f59e0b;">2 electrones desapareados</span><br>
@@ -1622,52 +1525,10 @@
             </div>
 
             <div class="formula-image">
-                <svg width="500" height="400" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Methane 3D representation -->
-                    <defs>
-                        <radialGradient id="carbonGrad">
-                            <stop offset="0%" style="stop-color:#4b5563"/>
-                            <stop offset="100%" style="stop-color:#1f2937"/>
-                        </radialGradient>
-                        <radialGradient id="hydrogenGrad">
-                            <stop offset="0%" style="stop-color:#f3f4f6"/>
-                            <stop offset="100%" style="stop-color:#9ca3af"/>
-                        </radialGradient>
-                    </defs>
-                    
-                    <!-- Bonds (back) -->
-                    <line x1="250" y1="200" x2="180" y2="280" stroke="#3b82f6" stroke-width="4" opacity="0.6"/>
-                    <line x1="250" y1="200" x2="320" y2="280" stroke="#3b82f6" stroke-width="4" opacity="0.6"/>
-                    
-                    <!-- Hydrogens (back) -->
-                    <circle cx="180" cy="280" r="25" fill="url(#hydrogenGrad)" stroke="#6b7280" stroke-width="2"/>
-                    <text x="180" y="285" text-anchor="middle" font-size="14" font-weight="bold" fill="#374151">H</text>
-                    
-                    <circle cx="320" cy="280" r="25" fill="url(#hydrogenGrad)" stroke="#6b7280" stroke-width="2"/>
-                    <text x="320" y="285" text-anchor="middle" font-size="14" font-weight="bold" fill="#374151">H</text>
-                    
-                    <!-- Carbon -->
-                    <circle cx="250" cy="200" r="35" fill="url(#carbonGrad)" stroke="#111827" stroke-width="3"/>
-                    <text x="250" y="207" text-anchor="middle" font-size="18" font-weight="bold" fill="white">C</text>
-                    
-                    <!-- Bonds (front) -->
-                    <line x1="250" y1="200" x2="250" y2="100" stroke="#3b82f6" stroke-width="5"/>
-                    <line x1="250" y1="200" x2="250" y2="320" stroke="#3b82f6" stroke-width="4" opacity="0.8"/>
-                    
-                    <!-- Hydrogens (front) -->
-                    <circle cx="250" cy="100" r="25" fill="url(#hydrogenGrad)" stroke="#6b7280" stroke-width="2"/>
-                    <text x="250" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#374151">H</text>
-                    
-                    <circle cx="250" cy="320" r="25" fill="url(#hydrogenGrad)" stroke="#6b7280" stroke-width="2"/>
-                    <text x="250" y="325" text-anchor="middle" font-size="14" font-weight="bold" fill="#374151">H</text>
-                    
-                    <!-- Labels -->
-                    <text x="250" y="380" text-anchor="middle" class="atom-label" font-size="16" font-weight="bold">Metano (CH₄)</text>
-                    <text x="250" y="30" text-anchor="middle" class="atom-label" font-size="14">Tetraédrico - 109.5°</text>
-                </svg>
+                <img src="images/methane-3d-structure.png" alt="Estructura Tridimensional del Metano" style="max-width: 100%; height: auto; border-radius: 12px;">
                 <p class="formula-caption">Figura 1.4: Estructura tridimensional del metano mostrando la geometría tetraédrica</p>
             </div>
-
+            
             <table class="comparison-table">
                 <thead>
                     <tr>
@@ -2011,54 +1872,11 @@
                 </div>
             </div>
 
-            <div class="diagram-container">
-                <h3 class="mb-2">Comparación Visual: Enlaces σ vs π</h3>
-                <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Sigma bond -->
-                    <g transform="translate(100, 200)">
-                        <text x="150" y="-120" class="atom-label" text-anchor="middle" font-weight="bold" font-size="16">ENLACE SIGMA (σ)</text>
-                        
-                        <!-- Orbital 1 -->
-                        <ellipse cx="50" cy="0" rx="40" ry="25" fill="rgba(59, 130, 246, 0.6)" stroke="#3b82f6" stroke-width="2"/>
-                        
-                        <!-- Orbital 2 -->
-                        <ellipse cx="250" cy="0" rx="40" ry="25" fill="rgba(59, 130, 246, 0.6)" stroke="#3b82f6" stroke-width="2"/>
-                        
-                        <!-- Overlap region -->
-                        <ellipse cx="150" cy="0" rx="30" ry="25" fill="rgba(16, 185, 129, 0.8)" stroke="#10b981" stroke-width="2"/>
-                        
-                        <!-- Nuclei -->
-                        <circle cx="50" cy="0" r="8" fill="#1f2937"/>
-                        <circle cx="250" cy="0" r="8" fill="#1f2937"/>
-                        
-                        <text x="150" y="60" class="atom-label" text-anchor="middle">Superposición frontal<br>Mayor densidad electrónica</text>
-                    </g>
-                    
-                    <!-- Pi bond -->
-                    <g transform="translate(550, 200)">
-                        <text x="150" y="-120" class="atom-label" text-anchor="middle" font-weight="bold" font-size="16">ENLACE PI (π)</text>
-                        
-                        <!-- Orbital 1 (top) -->
-                        <ellipse cx="150" cy="-50" rx="60" ry="30" fill="rgba(16, 185, 129, 0.6)" stroke="#10b981" stroke-width="2"/>
-                        
-                        <!-- Orbital 2 (top) -->
-                        <ellipse cx="150" cy="-50" rx="60" ry="30" fill="rgba(16, 185, 129, 0.6)" stroke="#10b981" stroke-width="2"/>
-                        
-                        <!-- Orbital 1 (bottom) -->
-                        <ellipse cx="150" cy="50" rx="60" ry="30" fill="rgba(16, 185, 129, 0.6)" stroke="#10b981" stroke-width="2"/>
-                        
-                        <!-- Orbital 2 (bottom) -->
-                        <ellipse cx="150" cy="50" rx="60" ry="30" fill="rgba(16, 185, 129, 0.6)" stroke="#10b981" stroke-width="2"/>
-                        
-                        <!-- Nuclei -->
-                        <circle cx="150" cy="0" r="8" fill="#1f2937"/>
-                        
-                        <text x="150" y="100" class="atom-label" text-anchor="middle">Superposición lateral<br>Densidad arriba y abajo</text>
-                    </g>
-                </svg>
+            <div class="formula-image">
+                <img src="images/sigma-pi-bonds.png" alt="Comparación de Enlaces Sigma y Pi" style="max-width: 100%; height: auto; border-radius: 12px;">
                 <p class="formula-caption">Figura 1.6: Diferencia entre superposición frontal (sigma) y lateral (pi) de orbitales atómicos</p>
             </div>
-
+            
             <div class="formula-box">
                 <strong>Relación Fortaleza - Longitud de Enlace:</strong><br><br>
                 
