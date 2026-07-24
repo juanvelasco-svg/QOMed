@@ -1125,7 +1125,7 @@
             <p>Bienvenido al primer capítulo de Química Orgánica. En esta unidad exploraremos los fundamentos del átomo de carbono, su estructura electrónica, y cómo estas características determinan las propiedades únicas de los compuestos orgánicos.</p>
             
             <div class="objectives-grid">
-                <div class="objective-card">
+                <div class="objective-card" onclick="scrollToSection('section1')" style="cursor: pointer;">
                     <div class="objective-icon">⚛️</div>
                     <div class="objective-content">
                         <h3>Estructura Atómica</h3>
@@ -1133,7 +1133,7 @@
                     </div>
                 </div>
                 
-                <div class="objective-card">
+                <div class="objective-card" onclick="scrollToSection('section3')" style="cursor: pointer;">
                     <div class="objective-icon">🔷</div>
                     <div class="objective-content">
                         <h3>Hibridación</h3>
@@ -1141,7 +1141,7 @@
                     </div>
                 </div>
                 
-                <div class="objective-card">
+                <div class="objective-card" onclick="scrollToSection('section5')" style="cursor: pointer;">
                     <div class="objective-icon"></div>
                     <div class="objective-content">
                         <h3>Enlaces</h3>
@@ -1149,7 +1149,7 @@
                     </div>
                 </div>
                 
-                <div class="objective-card">
+                <div class="objective-card" onclick="scrollToSection('section1')" style="cursor: pointer;">
                     <div class="objective-icon"></div>
                     <div class="objective-content">
                         <h3>Propiedades</h3>
@@ -2418,6 +2418,14 @@
             card.classList.toggle('flipped');
         }
 
+        // Desplazamiento suave a una sección
+        function scrollToSection(sectionId) {
+            var section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+            
         function toggleAccordion(header) {
             var item = header.parentElement;
             var wasActive = item.classList.contains('active');
